@@ -1,0 +1,2861 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>收集王</title>
+    <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/tailwindcss.js"></script>
+    <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/lucide.js"></script>
+    <style>
+        :root {
+            --primary: #4F8EFF; --primary-light: #EBF3FF; --primary-dark: #3A6FD8;
+            --success: #34A853; --success-light: #E6F4EA;
+            --warning: #FBBC04; --warning-light: #FEF7E0;
+            --error: #EA4335; --error-light: #FCE8E6;
+            --bg: #F0F2F5; --surface: #FFFFFF; --surface-dim: #F8F9FA;
+            --text-1: #1F1F1F; --text-2: #5F6368; --text-3: #9AA0A6;
+            --border: #E8EAED;
+        }
+        /* Theme: Green */
+        [data-color="green"] { --primary: #10B981; --primary-light: #D1FAE5; --primary-dark: #059669; }
+        /* Theme: Purple */
+        [data-color="purple"] { --primary: #8B5CF6; --primary-light: #EDE9FE; --primary-dark: #7C3AED; }
+        /* Theme: Orange */
+        [data-color="orange"] { --primary: #F97316; --primary-light: #FFF7ED; --primary-dark: #EA580C; }
+        /* Theme: Teal */
+        [data-color="teal"] { --primary: #06B6D4; --primary-light: #CFFAFE; --primary-dark: #0891B2; }
+        /* Theme: Pink */
+        [data-color="pink"] { --primary: #EC4899; --primary-light: #FCE7F3; --primary-dark: #DB2777; }
+        /* Theme: Gray */
+        [data-color="gray"] { --primary: #6B7280; --primary-light: #F3F4F6; --primary-dark: #4B5563; }
+        /* Theme: Mono */
+        [data-color="mono"] { --primary: #374151; --primary-light: #F9FAFB; --primary-dark: #1F2937; }
+        /* Dark mode overrides */
+        [data-theme="dark"] {
+            --bg: #1A1A1A; --surface: #2D2D2D; --surface-dim: #242424;
+            --text-1: #E8E8E8; --text-2: #AAAAAA; --text-3: #777777;
+            --border: #404040;
+            --primary-light: rgba(79,142,255,0.15);
+            --success-light: rgba(52,168,83,0.15);
+            --warning-light: rgba(251,188,4,0.15);
+            --error-light: rgba(234,67,53,0.15);
+        }
+        [data-color="green"][data-theme="dark"] { --primary-light: rgba(16,185,129,0.15); }
+        [data-color="purple"][data-theme="dark"] { --primary-light: rgba(139,92,246,0.15); }
+        [data-color="orange"][data-theme="dark"] { --primary-light: rgba(249,115,22,0.15); }
+        [data-color="teal"][data-theme="dark"] { --primary-light: rgba(6,182,212,0.15); }
+        [data-color="pink"][data-theme="dark"] { --primary-light: rgba(236,72,153,0.15); }
+        [data-color="gray"][data-theme="dark"] { --primary-light: rgba(107,114,128,0.15); }
+        [data-color="mono"][data-theme="dark"] { --primary-light: rgba(55,65,81,0.15); }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', sans-serif; background: var(--bg); min-height: 100vh; min-height: 100dvh; -webkit-user-select: none; user-select: none; overscroll-behavior: none; }
+        .screen { display: none; flex-direction: column; background: var(--bg); min-height: 100vh; min-height: 100dvh; padding-bottom: 80px; }
+        .screen.active { display: flex; }
+        .screen::-webkit-scrollbar { width: 0; }
+        .bottom-nav { background: var(--surface); border-top: 1px solid var(--border); display: flex; padding: 6px 0 22px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; padding-bottom: calc(22px + env(safe-area-inset-bottom)); box-shadow: 0 -1px 6px rgba(0,0,0,0.04); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; cursor: pointer; transition: all 0.2s; position: relative; border: none; background: none; }
+        .nav-item i { width: 24px; height: 24px; color: var(--text-3); transition: all 0.2s; }
+        .nav-item span { font-size: 10px; font-weight: 500; color: var(--text-3); transition: all 0.2s; }
+        .nav-item.active i { color: var(--primary); }
+        .nav-item.active span { color: var(--primary); font-weight: 600; }
+        .nav-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 32px; height: 3px; background: var(--primary); border-radius: 0 0 3px 3px; }
+        .card { background: var(--surface); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); overflow: hidden; }
+        .section-title { font-size: 17px; font-weight: 700; color: var(--text-1); padding: 0 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+        .btn-primary { background: var(--primary); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.15s; }
+        .btn-primary:hover { background: var(--primary-dark); }
+        .btn-primary:disabled { background: var(--border); color: var(--text-3); cursor: not-allowed; }
+        .btn-success { background: var(--success); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
+        .btn-success:disabled { background: var(--border); color: var(--text-3); cursor: not-allowed; }
+        .btn-outlined { background: none; color: var(--primary); border: 1.5px solid var(--primary); padding: 10px 20px; border-radius: 12px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-text { background: none; border: none; color: var(--primary); padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; }
+        .input-field { width: 100%; padding: 14px 16px; border: 1.5px solid var(--border); border-radius: 12px; font-size: 15px; outline: none; transition: border-color 0.2s; background: var(--surface); color: var(--text-1); }
+        .input-field:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-light); }
+        .input-field::placeholder { color: var(--text-3); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 50; display: none; align-items: flex-end; justify-content: center; }
+        .overlay.active { display: flex; }
+        .overlay.center { align-items: center; padding: 24px; }
+        .dialog { background: var(--surface); border-radius: 24px 24px 0 0; padding: 24px 20px calc(32px + env(safe-area-inset-bottom)); width: 100%; animation: slideUp 0.3s cubic-bezier(0.16,1,0.3,1); }
+        .overlay.center .dialog { border-radius: 24px; max-width: 340px; max-height: 80vh; overflow-y: auto; }
+        @keyframes slideUp { from { transform: translateY(100%) } to { transform: translateY(0) } }
+        .dialog-handle { width: 32px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
+        .dialog h3 { font-size: 18px; font-weight: 700; color: var(--text-1); margin-bottom: 8px; }
+        .dialog p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
+        .toast-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; pointer-events: none; }
+        .toast { background: rgba(50,50,50,0.92); color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; line-height: 1.5; box-shadow: 0 4px 20px rgba(0,0,0,0.25); max-width: 340px; width: 100%; animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; text-align: center; border-left: 4px solid var(--primary); }
+        .toast.success { background: rgba(46,125,50,0.92); border-left-color: #4CAF50; }
+        .toast.warning { background: rgba(230,81,0,0.92); border-left-color: #FF9800; }
+        .toast.error { background: rgba(198,40,40,0.92); border-left-color: #f44336; }
+        .toast.theme { background: var(--primary); border-left-color: var(--primary-dark); }
+        .toast.bottom { position: fixed; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); color: #333; font-size: 12px; padding: 8px 16px; border-radius: 20px; border-left: none; max-width: 260px; animation: toastBottomIn 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .toast.bottom.out { animation: toastBottomOut 0.2s ease forwards; }
+        .toast.out { animation: toastOut 0.25s ease forwards; }
+        @keyframes toastIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes toastOut { from { transform: scale(1); opacity: 1; } to { transform: scale(0.85); opacity: 0; } }
+        @keyframes toastBottomIn { from { opacity: 0; transform: translateX(-50%) translateY(10px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @keyframes toastBottomOut { from { opacity: 1; transform: translateX(-50%) translateY(0); } to { opacity: 0; transform: translateX(-50%) translateY(10px); } }
+        .dialog-actions { display: flex; gap: 8px; margin-top: 20px; }
+        .template-item { display: flex; align-items: center; gap: 14px; padding: 14px 16px; cursor: pointer; transition: background 0.15s; }
+        .template-item:active { background: var(--surface-dim); }
+        .empty-state { text-align: center; padding: 40px 20px; }
+        .empty-state i { color: var(--text-3); }
+        .empty-state p { font-size: 14px; color: var(--text-2); margin-top: 8px; }
+        .share-grid { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap: 12px; text-align: center; }
+        .share-item { display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+        .share-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
+        .share-label { font-size: 11px; color: var(--text-2); font-weight: 500; }
+        .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; }
+        .doc-btn:active { transform: scale(0.96); }
+        .photo-frame { width: 100%; aspect-ratio: 4/3; border: 2px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; background: var(--surface-dim); -webkit-user-select: none; user-select: none; }
+        .photo-frame:active { transform: scale(0.97); border-color: var(--primary); background: var(--primary-light); }
+        .photo-frame.has-photo { border-style: solid; border-color: var(--success); }
+        .photo-frame .photo-thumb { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; border-radius: 10px; transition: transform 0.2s ease; }
+        .photo-frame .photo-overlay { position: absolute; inset: 0; background: linear-gradient(transparent 60%, rgba(0,0,0,0.5)); border-radius: 10px; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px; opacity: 0; transition: opacity 0.2s; }
+        .photo-frame.has-photo:hover .photo-overlay, .photo-frame.has-photo:active .photo-overlay { opacity: 1; }
+        .photo-frame .photo-overlay span { color: white; font-size: 11px; font-weight: 500; }
+        .photo-label { font-size: 13px; font-weight: 600; color: var(--text-1); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+        .photo-label .photo-count { font-size: 11px; font-weight: 500; color: var(--text-3); }
+        .photos-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+        .photo-actions { display: flex; gap: 6px; }
+        .photo-actions button { font-size: 11px; padding: 4px 10px; border-radius: 6px; border: none; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 3px; }
+        .photo-frame-wrap { position: relative; }
+        .photo-frame-wrap .remove-frame { position: absolute; top: -10px; right: -10px; width: 30px; height: 30px; border-radius: 50%; background: var(--error); border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 2; box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+        .photo-frame-wrap .remove-frame i { width: 16px; height: 16px; color: white; }
+        .icon-picker { display: grid; grid-template-columns: repeat(8,1fr); gap: 4px; padding: 4px; }
+        .icon-picker-item { width: 100%; aspect-ratio: 1; border-radius: 8px; border: 1.5px solid var(--border); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.15s; background: var(--surface); }
+        .icon-picker-item:hover { border-color: var(--primary); background: var(--primary-light); }
+        .icon-picker-item.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 2px var(--primary-light); }
+        .multi-album-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 16px; transition: all 0.15s; }
+        .multi-album-btn:active { background: var(--primary); color: white; }
+    </style>
+</head>
+<body>
+    <div id="app">
+
+        <!-- ===== TAB 1: HOME ===== -->
+        <div class="screen active" id="tab-home">
+            <div style="background:var(--surface);padding:16px 20px 12px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:22px;font-weight:800;color:var(--text-1);margin-top:2px;">首页</div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button style="width:40px;height:40px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="switchTab('history')"><i data-lucide="clock" style="width:20px;height:20px;color:var(--text-2);"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:12px 20px 16px;">
+                <div class="section-title">我的模板</div>
+                <div id="home-template-list"></div>
+                <div id="home-empty-hint" style="text-align:center;padding:32px 20px;display:none;">
+                    <div style="font-size:14px;color:var(--text-3);">选择模版开始收集</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HISTORY PAGE ===== -->
+        <div class="screen" id="tab-history">
+            <div style="background:var(--surface);padding:16px 20px 12px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="switchTab('home')"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:700;color:var(--text-1);">历史记录</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:1px;">已归档的收集材料</div>
+                    </div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:12px 20px 16px;">
+                <div id="history-list"></div>
+            </div>
+        </div>
+
+        <!-- ===== COLLECTION PAGE (doc type grid) ===== -->
+        <div class="screen" id="tab-collection">
+            <div style="background:var(--surface);padding:16px 20px 16px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="handleCollectionBack()"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:700;color:var(--text-1);" id="collection-title">证件收集</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:1px;">选择证件类型开始拍照</div>
+                    </div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 20px 120px;">
+                <div class="section-title" style="padding:0 0 12px;">证件类型</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;" id="doc-grid"></div>
+            </div>
+            <div style="position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));left:20px;right:20px;z-index:15;">
+                <div style="text-align:center;font-size:12px;color:var(--text-3);margin-bottom:6px;" id="collection-photo-count">已上传 0 张照片</div>
+                <button class="btn-success" id="pack-btn" style="box-shadow:0 4px 16px rgba(52,168,83,0.3);" onclick="handlePackClick()">
+                    <i data-lucide="archive" style="width:18px;height:18px;"></i> 打包分享
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== DOC DETAIL PAGE (photo frames for a specific doc type) ===== -->
+        <div class="screen" id="tab-doc-detail">
+            <div style="background:var(--surface);padding:16px 20px 16px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="handleDocDetailBack()"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:700;color:var(--text-1);" id="doc-detail-title">身份证</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:1px;">单击拍照 · 长按相册多选</div>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:4px;">
+                        <div style="width:8px;height:8px;border-radius:50%;background:var(--success);" id="doc-detail-dot"></div>
+                        <span style="font-size:12px;font-weight:600;color:var(--success);" id="doc-detail-count">0 张</span>
+                    </div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 20px 24px;" id="doc-detail-content">
+            </div>
+        </div>
+
+        <!-- ===== TAB 2: TEMPLATE MANAGEMENT ===== -->
+        <div class="screen" id="tab-template">
+            <div style="background:var(--surface);padding:16px 20px 12px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <div>
+                        <div style="font-size:22px;font-weight:800;color:var(--text-1);">模板管理</div>
+                        <div style="font-size:13px;color:var(--text-2);margin-top:2px;">管理收集模版</div>
+                    </div>
+                    <div style="display:flex;gap:8px;">
+                        <button style="width:40px;height:40px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="showImportTemplateDialog()"><i data-lucide="download" style="width:20px;height:20px;color:var(--text-2);"></i></button>
+                        <button style="width:40px;height:40px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="exportAllTemplates()"><i data-lucide="upload" style="width:20px;height:20px;color:var(--text-2);"></i></button>
+                        <button style="width:40px;height:40px;border-radius:50%;background:var(--primary);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(26,115,232,0.3);" onclick="showNewTemplateDialog()"><i data-lucide="plus" style="width:20px;height:20px;color:white;"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:12px 20px 16px;">
+                <div id="template-list"></div>
+            </div>
+        </div>
+
+        <!-- ===== TAB 3: SETTINGS ===== -->
+        <div class="screen" id="tab-settings">
+            <div style="background:var(--surface);padding:16px 20px 12px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="font-size:22px;font-weight:800;color:var(--text-1);">设置</div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 20px 24px;">
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">照片处理</div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="minimize-2" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                                <span style="font-size:15px;font-weight:500;">压缩质量</span>
+                            </div>
+                            <span style="font-size:16px;font-weight:700;color:var(--primary);" id="q-val">70%</span>
+                        </div>
+                        <input type="range" min="10" max="100" value="70" step="1" id="quality-slider" style="width:100%;accent-color:var(--primary);" oninput="document.getElementById('q-val').textContent=this.value+'%';localStorage.setItem('ck_quality',this.value);if(typeof NativeBridge!=='undefined'&&NativeBridge.setCompressQuality){NativeBridge.setCompressQuality(parseInt(this.value))}">
+                        <div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="font-size:11px;color:var(--text-3);">低质量 · 小文件</span><span style="font-size:11px;color:var(--text-3);">高质量 · 大文件</span></div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--success-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="file-text" style="width:18px;height:18px;color:var(--success);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">照片命名方式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="naming-type-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('type')">按证件类型</button>
+                            <button id="naming-order-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('order')">按拍摄顺序</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="naming-hint">照片按「证件类型名_序号」命名，如：身份证_01.jpg</div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="folder" style="width:18px;height:18px;color:var(--warning);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">打包归类方式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="pack-flat-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('flat')">不分类打包</button>
+                            <button id="pack-folder-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('folder')">按类型分文件夹</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="pack-hint">所有照片不分类，直接放在ZIP根目录</div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--error-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="clock" style="width:18px;height:18px;color:var(--error);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">压缩包命名</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="ts-off-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('off')">不带时间戳</button>
+                            <button id="ts-on-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('on')">带时间戳</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="ts-hint">压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）</div>
+                    </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">外观</div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="palette" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">主题颜色</span>
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;" id="theme-color-picker">
+                            <div class="theme-color-item selected" data-color="blue" onclick="setThemeColor('blue')" style="width:32px;height:32px;border-radius:50%;background:#4F8EFF;cursor:pointer;border:2px solid var(--primary);box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="green" onclick="setThemeColor('green')" style="width:32px;height:32px;border-radius:50%;background:#10B981;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="purple" onclick="setThemeColor('purple')" style="width:32px;height:32px;border-radius:50%;background:#8B5CF6;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="orange" onclick="setThemeColor('orange')" style="width:32px;height:32px;border-radius:50%;background:#F97316;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="teal" onclick="setThemeColor('teal')" style="width:32px;height:32px;border-radius:50%;background:#06B6D4;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="pink" onclick="setThemeColor('pink')" style="width:32px;height:32px;border-radius:50%;background:#EC4899;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="gray" onclick="setThemeColor('gray')" style="width:32px;height:32px;border-radius:50%;background:#6B7280;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="mono" onclick="setThemeColor('mono')" style="width:32px;height:32px;border-radius:50%;background:#374151;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                        </div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--surface-dim);display:flex;align-items:center;justify-content:center;"><i data-lucide="moon" style="width:18px;height:18px;color:var(--text-2);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">深色模式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="dark-off-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('off')">浅色</button>
+                            <button id="dark-on-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('on')">深色</button>
+                            <button id="dark-auto-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('auto')">跟随系统</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="dark-hint">使用浅色模式</div>
+                    </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">证件类型管理</div>
+                <div class="card" style="margin-bottom:20px;cursor:pointer;" onclick="switchTab('type-manager')">
+                    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;">
+                        <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="layers" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:600;color:var(--text-1);">管理证件类型</div>
+                            <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="type-count-hint">查看和管理所有证件类型</div>
+                        </div>
+                        <i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-3);"></i>
+                    </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">数据管理</div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="clearAllCache()">
+                        <div style="width:36px;height:36px;border-radius:10px;background:var(--error-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="trash" style="width:18px;height:18px;color:var(--error);"></i></div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:600;color:var(--text-1);">清理缓存数据</div>
+                            <div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="cache-size-hint">清理历史照片缓存和临时数据</div>
+                        </div>
+                        <i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-3);"></i>
+                    </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">使用说明</div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="home" style="width:14px;height:14px;color:var(--primary);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">首页收集</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">选择模板开始收集证件照片。点击空白区域拍照，长按空白区域可从相册多选照片。</div></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--success-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="eye" style="width:14px;height:14px;color:var(--success);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">照片预览</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">点击已有照片可全屏预览，双指缩放，点击旋转按钮可旋转照片。</div></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="package" style="width:14px;height:14px;color:var(--warning);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">打包分享</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">收集完成后点击打包，所有照片将压缩为ZIP文件，可分享给他人。支持按证件类型或拍摄顺序命名，可按类型分文件夹或不分类打包。</div></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="minimize-2" style="width:14px;height:14px;color:var(--primary);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">照片压缩</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">拍照后自动压缩照片，可在设置中调节压缩质量，质量越低文件越小。</div></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--error-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="layout-template" style="width:14px;height:14px;color:var(--error);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">模板管理</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">在模板页创建、编辑模板。支持导入导出模板，导出为TXT文件，导入时自动恢复自定义证件类型。</div></div>
+                        </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="history" style="width:14px;height:14px;color:var(--primary);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">历史记录</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">打包记录自动保存，可查看历史打包详情、继续编辑或重新分享。</div></div>
+                        </div>
+                    </div>
+                </div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">关于</div>
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;display:flex;align-items:center;gap:12px;">
+                        <div style="width:44px;height:44px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;"><i data-lucide="shield-check" style="width:24px;height:24px;color:white;"></i></div>
+                        <div><div style="font-size:15px;font-weight:600;color:var(--text-1);cursor:pointer;user-select:none;" onclick="handleSecretTap()" id="app-name-text">收集王</div><div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="app-version">版本 1.4.4</div></div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:12px 16px 16px;">
+                        <p style="font-size:13px;color:var(--text-2);line-height:1.7;">收集王是一款证件材料收集助手，帮助您快速收集、整理和打包各类证件照片。支持自定义证件类型、模板管理、照片压缩、一键打包分享，让材料收集更高效便捷。</p>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:12px 16px 16px;">
+                        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+                            <i data-lucide="user" style="width:14px;height:14px;color:var(--text-3);"></i>
+                            <span style="font-size:13px;color:var(--text-2);">作者：Elvis</span>
+                        </div>
+                        <span onclick="openExternalUrl('https://xhslink.com/m/5LKjPKCfdZJ')" style="display:flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer;">
+                            <i data-lucide="external-link" style="width:14px;height:14px;color:var(--primary);"></i>
+                            <span style="font-size:13px;color:var(--primary);">小红书主页</span>
+                        </span>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:12px 16px 16px;">
+                        <div style="display:flex;align-items:center;justify-content:space-between;cursor:pointer;" onclick="toggleChangelog()">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <i data-lucide="sparkles" style="width:14px;height:14px;color:var(--primary);"></i>
+                                <span style="font-size:13px;font-weight:600;color:var(--text-1);">更新日志</span>
+                            </div>
+                            <i data-lucide="chevron-down" style="width:16px;height:16px;color:var(--text-3);transition:transform 0.2s;" id="changelog-arrow"></i>
+                        </div>
+                        <div style="font-size:12px;color:var(--text-2);line-height:1.8;margin-top:10px;">
+                            <div style="margin-bottom:6px;"><b style="color:var(--primary);">1.4.4</b> 自定义Toast提示；清理缓存确认对话框；历史记录上限50条；照片旋转缩略图适配</div>
+                        </div>
+                        <div id="changelog-detail" style="display:none;font-size:12px;color:var(--text-2);line-height:1.8;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.4.3</b> 深色模式HyperOS及时识别；照片缩略图旋转适配；历史照片压缩质量提升；缓存清理增强</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.4.2</b> 修复深色模式无法跟随系统；修复照片缩略图居中显示；删除红色主题并缩小颜色按钮；修复历史记录删除后存储未释放</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.4.1</b> 修复返回手势退出后重入APP失效；修复历史照片存储上限问题；修复照片旋转预览居中问题；修复HyperOS深色模式不跟随系统；新增粉红/灰色/黑白主题色</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.4.0</b> 新增主题颜色切换（6种配色）；新增深色模式（支持跟随系统）；修复照片预览居中问题；修复旋转方向残留问题；优化历史照片存储策略</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.3.3</b> 修复历史预览图片层级遮挡；修复历史照片超限丢失；修复手势返回偶发退出</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.3.2</b> 修复返回键导航逻辑；修复权限请求时黑屏闪退问题</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.3.1</b> 品牌更新为「收集王」，去除行业限制；新增作者信息</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.3.0</b> 新增照片命名方式与打包归类设置；修复历史记录照片丢失问题；优化对话框样式</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.2.3</b> 全面屏适配；暂存功能优化；新增APP图标</div>
+                            <div><b style="color:var(--text-1);">1.2.0</b> 新增照片压缩功能；模板导入导出；自定义证件类型</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== UPLOAD PROGRESS DIALOG ===== -->
+        <div class="overlay center" id="upload-progress-dialog" style="display:none;">
+            <div class="dialog" style="min-width:280px;">
+                <div style="text-align:center;">
+                    <div style="width:56px;height:56px;border-radius:50%;background:var(--success-light);display:flex;align-items:center;justify-content:center;margin:0 auto 12px;"><i data-lucide="image-plus" style="width:28px;height:28px;color:var(--success);"></i></div>
+                    <h3 style="margin-bottom:4px;">处理照片</h3>
+                    <p id="upload-progress-text" style="font-size:14px;color:var(--text-2);">正在处理照片 0/0</p>
+                </div>
+                <div style="margin-top:16px;height:6px;background:var(--border);border-radius:3px;overflow:hidden;">
+                    <div id="upload-progress-fill" style="height:100%;background:var(--success);border-radius:3px;transition:width 0.3s;width:0%;"></div>
+                </div>
+                <p style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-3);" id="upload-progress-pct">0%</p>
+            </div>
+        </div>
+
+        <!-- ===== BOTTOM NAV ===== -->
+        <div class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('home')"><i data-lucide="home"></i><span>首页</span></button>
+            <button class="nav-item" onclick="switchTab('template')"><i data-lucide="layout-template"></i><span>模板</span></button>
+            <button class="nav-item" onclick="switchTab('settings')"><i data-lucide="settings"></i><span>设置</span></button>
+        </div>
+
+        <!-- ===== TYPE MANAGER PAGE ===== -->
+        <div class="screen" id="tab-type-manager">
+            <div style="background:var(--surface);padding:16px 20px 16px;padding-top:calc(16px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="handleTypeManagerBack()"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;">
+                        <div style="font-size:18px;font-weight:700;color:var(--text-1);">证件类型管理</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:1px;">管理所有证件类型，支持编辑和删除</div>
+                    </div>
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--primary);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="showAddTypeDialog()"><i data-lucide="plus" style="width:18px;height:18px;color:white;"></i></button>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:12px 20px 24px;">
+                <div id="type-manager-list"></div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Edit Template ===== -->
+        <div class="overlay" id="edit-template-dialog" onclick="if(event.target===this)hideDialog('edit-template-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3 id="edit-dialog-title">新建模板</h3>
+                <div style="margin-top:16px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板名称</label>
+                    <input class="input-field" id="tpl-name-input" placeholder="如：证件收集" maxlength="20">
+                </div>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板描述</label>
+                    <input class="input-field" id="tpl-desc-input" placeholder="如：常用证件材料收集" maxlength="40">
+                </div>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择图标</label>
+                    <div class="icon-picker" id="tpl-icon-picker"></div>
+                </div>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择证件类型</label>
+                    <div id="tpl-type-picker" style="display:flex;flex-wrap:wrap;gap:8px;max-height:120px;overflow-y:auto;padding:4px;"></div>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('edit-template-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;" id="tpl-save-btn" onclick="saveTemplate()">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Delete Template Confirm ===== -->
+        <div class="overlay center" id="delete-tpl-dialog" onclick="if(event.target===this)hideDialog('delete-tpl-dialog')">
+            <div class="dialog">
+                <h3>删除模板</h3>
+                <p>确定要删除此模板吗？此操作不可撤销。</p>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('delete-tpl-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;background:var(--error);" onclick="confirmDeleteTemplate()">删除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Pack Confirm ===== -->
+        <div class="overlay center" id="pack-dialog" onclick="if(event.target===this)hideDialog('pack-dialog')">
+            <div class="dialog">
+                <h3>打包确认</h3>
+                <p id="pack-dialog-msg">确定要打包当前所有证件照片吗？</p>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">打包名称</label>
+                    <input class="input-field" id="pack-name-input" placeholder="如：张三_证件材料" maxlength="30">
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('pack-dialog')">取消</button>
+                    <button class="btn-success" style="flex:1;" onclick="startPacking()">开始打包</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Pack Progress ===== -->
+        <div class="overlay center" id="pack-progress-dialog">
+            <div class="dialog">
+                <div style="text-align:center;">
+                    <div style="width:56px;height:56px;border-radius:50%;background:var(--primary-light);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;"><i data-lucide="archive" style="width:28px;height:28px;color:var(--primary);"></i></div>
+                    <h3 style="margin-bottom:4px;">正在打包</h3>
+                    <p id="pack-progress-text" style="font-size:13px;">准备中...</p>
+                </div>
+                <div class="progress-bar" style="margin-top:16px;"><div class="progress-fill" id="pack-progress-bar" style="width:0%"></div></div>
+                <p style="text-align:center;margin-top:8px;font-size:12px;color:var(--text-3);" id="pack-progress-pct">0%</p>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Share ===== -->
+        <div class="overlay" id="share-dialog" onclick="if(event.target===this)hideDialog('share-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3>分享给</h3>
+                <div class="share-grid" style="margin-top:16px;">
+                    <div class="share-item" onclick="shareVia('wework')"><div class="share-icon" style="background:#07C160;"><i data-lucide="message-circle" style="width:24px;height:24px;color:white;"></i></div><span class="share-label">企业微信</span></div>
+                    <div class="share-item" onclick="shareVia('wechat')"><div class="share-icon" style="background:#07C160;"><i data-lucide="message-circle" style="width:24px;height:24px;color:white;"></i></div><span class="share-label">微信</span></div>
+                    <div class="share-item" onclick="shareVia('qq')"><div class="share-icon" style="background:#12B7F5;"><i data-lucide="message-circle" style="width:24px;height:24px;color:white;"></i></div><span class="share-label">QQ</span></div>
+                    <div class="share-item" onclick="shareVia('local')"><div class="share-icon" style="background:var(--text-2);"><i data-lucide="folder-down" style="width:24px;height:24px;color:white;"></i></div><span class="share-label">本地保存</span></div>
+                    <div class="share-item" onclick="shareVia('more')"><div class="share-icon" style="background:var(--text-3);"><i data-lucide="share-2" style="width:24px;height:24px;color:white;"></i></div><span class="share-label">更多</span></div>
+                </div>
+                <div class="dialog-actions"><button class="btn-outlined" style="flex:1;" onclick="hideDialog('share-dialog')">取消</button></div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Import Template ===== -->
+        <div class="overlay" id="import-template-dialog" onclick="if(event.target===this)hideDialog('import-template-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3>导入模板</h3>
+                <p style="font-size:13px;color:var(--text-2);margin-top:4px;">粘贴从其他设备导出的模板JSON数据</p>
+                <div style="margin-top:12px;">
+                    <textarea class="input-field" id="import-json-input" style="height:160px;resize:none;font-size:12px;font-family:monospace;" placeholder="粘贴模板JSON数据..."></textarea>
+                </div>
+                <div id="import-preview" style="margin-top:12px;display:none;"></div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('import-template-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;" onclick="confirmImportTemplate()">导入</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Add Custom Type ===== -->
+        <div class="overlay" id="add-type-dialog" onclick="if(event.target===this)hideDialog('add-type-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3>添加证件类型</h3>
+                <div style="margin-top:16px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">类型名称</label>
+                    <input class="input-field" id="new-type-name" placeholder="如：户口本" maxlength="10">
+                </div>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择图标</label>
+                    <div class="icon-picker" id="type-icon-picker"></div>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('add-type-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;" onclick="addCustomType()">添加</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Delete Custom Type ===== -->
+        <div class="overlay center" id="del-type-dialog" onclick="if(event.target===this)hideDialog('del-type-dialog')">
+            <div class="dialog">
+                <h3>删除证件类型</h3>
+                <p id="del-type-msg">确定要删除此证件类型吗？</p>
+                <div id="del-type-templates" style="margin-top:8px;display:none;"></div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('del-type-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;background:var(--error);" onclick="confirmDeleteType()">删除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Edit Type ===== -->
+        <div class="overlay" id="edit-type-dialog" onclick="if(event.target===this)hideDialog('edit-type-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3 id="edit-type-dialog-title">编辑证件类型</h3>
+                <div style="margin-top:16px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">类型名称</label>
+                    <input class="input-field" id="edit-type-name" placeholder="如：户口本" maxlength="10">
+                </div>
+                <div style="margin-top:14px;">
+                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择图标</label>
+                    <div class="icon-picker" id="edit-type-icon-picker"></div>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('edit-type-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;" onclick="saveEditType()">保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Photo Preview (fullscreen) ===== -->
+        <div class="overlay" id="photo-preview-dialog" style="background:rgba(0,0,0,0.95);align-items:center;justify-content:center;z-index:60;">
+            <div style="width:100vw;height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+                <div id="photo-preview-container" style="flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;touch-action:none;width:100%;">
+                    <img id="photo-preview-img" style="max-width:100%;max-height:100%;object-fit:contain;display:block;transform-origin:center center;" src="">
+                </div>
+                <div style="display:flex;justify-content:center;gap:20px;padding:16px 0 calc(16px + env(safe-area-inset-bottom));flex-shrink:0;">
+                    <button style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="rotatePreview()"><i data-lucide="rotate-cw" style="width:22px;height:22px;color:white;"></i></button>
+                    <button style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="retakePhoto()"><i data-lucide="camera" style="width:22px;height:22px;color:white;"></i></button>
+                    <button style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,0.2);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="closePreview()"><i data-lucide="x" style="width:22px;height:22px;color:white;"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Temp Data (Save/Discard) ===== -->
+        <div class="overlay center" id="temp-data-dialog">
+            <div class="dialog">
+                <h3>发现未完成的收集</h3>
+                <p id="temp-data-msg">您有上次未完成的证件收集数据，是否恢复？</p>
+                <div class="dialog-actions" style="flex-direction:column;gap:8px;">
+                    <button class="btn-success" style="width:100%;" onclick="restoreTempData(currentTemplate?currentTemplate.id:null)">恢复数据</button>
+                    <button class="btn-primary" style="width:100%;background:var(--error);" onclick="discardTempData(currentTemplate?currentTemplate.id:null)">丢弃数据</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Collection Back Confirm ===== -->
+        <div class="overlay center" id="back-confirm-dialog" onclick="if(event.target===this)hideDialog('back-confirm-dialog')">
+            <div class="dialog">
+                <h3>返回确认</h3>
+                <p>您有未打包的证件照片，是否暂存？</p>
+                <div class="dialog-actions" style="flex-direction:column;gap:8px;">
+                    <button class="btn-success" style="width:100%;" onclick="saveTempAndBack()">暂存数据</button>
+                    <button class="btn-primary" style="width:100%;background:var(--error);" onclick="discardAndBack()">丢弃数据</button>
+                    <button class="btn-primary" style="width:100%;background:#4F8EFF;" onclick="hideDialog('back-confirm-dialog')">继续编辑</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Add Photo (camera / album) ===== -->
+        <div class="overlay" id="add-photo-dialog" onclick="if(event.target===this)hideDialog('add-photo-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3>添加照片</h3>
+                <p style="margin-bottom:16px;">选择拍照或从相册选取照片</p>
+                <button class="btn-primary" style="margin-bottom:10px;" onclick="hideDialog('add-photo-dialog');openCamera(addPhotoDocType, -1)">
+                    <i data-lucide="camera" style="width:18px;height:18px;"></i> 拍照
+                </button>
+                <button class="btn-outlined" style="width:100%;justify-content:center;padding:14px;" onclick="hideDialog('add-photo-dialog');openAlbumMulti(addPhotoDocType)">
+                    <i data-lucide="images" style="width:18px;height:18px;"></i> 从相册选择（可多选）
+                </button>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Delete History Record ===== -->
+        <div class="overlay center" id="delete-history-dialog" onclick="if(event.target===this)hideDialog('delete-history-dialog')">
+            <div class="dialog">
+                <h3>删除记录</h3>
+                <p>确定要删除此历史记录吗？相关文件也将被清除。</p>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('delete-history-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;background:var(--error);" onclick="confirmDeleteHistory()">删除</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: Clear Cache ===== -->
+        <div class="overlay center" id="clear-cache-dialog" onclick="if(event.target===this)hideDialog('clear-cache-dialog')">
+            <div class="dialog">
+                <h3>清理数据</h3>
+                <div id="cache-info" style="margin:12px 0;font-size:13px;color:var(--text-2);line-height:1.7;"></div>
+                <div style="background:var(--warning-light);padding:10px 12px;border-radius:8px;margin-bottom:12px;">
+                    <div style="font-size:12px;color:var(--warning);font-weight:600;">⚠ 风险提示</div>
+                    <div style="font-size:12px;color:var(--text-2);margin-top:4px;line-height:1.5;">清理后历史记录和照片将无法恢复，打包文件也将被删除。您的模板、证件类型和设置不受影响。</div>
+                </div>
+                <div class="dialog-actions">
+                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('clear-cache-dialog')">取消</button>
+                    <button class="btn-primary" style="flex:1;background:var(--error);" onclick="confirmClearCache()">确认清理</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== DIALOG: History Detail ===== -->
+        <div class="overlay" id="history-detail-dialog" onclick="if(event.target===this)hideDialog('history-detail-dialog')">
+            <div class="dialog">
+                <div class="dialog-handle"></div>
+                <h3 id="history-detail-title">记录详情</h3>
+                <div id="history-detail-content" style="margin-top:12px;max-height:50vh;overflow-y:auto;"></div>
+                <div class="dialog-actions" style="flex-direction:column;gap:8px;">
+                    <button class="btn-primary" style="width:100%;" onclick="reShareHistory()"><i data-lucide="share-2" style="width:16px;height:16px;"></i> 重新分享</button>
+                    <button class="btn-success" style="width:100%;" onclick="editFromHistory()"><i data-lucide="edit-3" style="width:16px;height:16px;"></i> 继续编辑</button>
+                    <button class="btn-outlined" style="width:100%;justify-content:center;" onclick="hideDialog('history-detail-dialog')">关闭</button>
+                </div>
+            </div>
+        </div>
+
+    </div><!-- end #app -->
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script>
+    // ===== TOAST =====
+    function showToast(msg, type, duration) {
+        type = type || 'info';
+        duration = duration || 2500;
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast ' + type;
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(function() {
+            toast.classList.add('out');
+            setTimeout(function() { toast.remove(); }, 250);
+        }, duration);
+    }
+
+    function toggleChangelog() {
+        const detail = document.getElementById('changelog-detail');
+        const arrow = document.getElementById('changelog-arrow');
+        if (detail.style.display === 'none') {
+            detail.style.display = 'block';
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            detail.style.display = 'none';
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // ===== SECRET TAP: 7 taps on app name opens update link =====
+    var secretTapCount = 0;
+    var secretTapTimer = null;
+    function handleSecretTap() {
+        secretTapCount++;
+        if (secretTapTimer) clearTimeout(secretTapTimer);
+        secretTapTimer = setTimeout(function() { secretTapCount = 0; }, 500);
+        if (secretTapCount >= 3 && secretTapCount < 7) {
+            showBottomToast('再点击' + (7 - secretTapCount) + '下打开更新网站', 800);
+        }
+        if (secretTapCount >= 7) {
+            secretTapCount = 0;
+            openExternalUrl('https://share.fnnas.net/s/84e809e4371440549a');
+        }
+    }
+
+    // Open URL in device's default browser (not in WebView)
+    function openExternalUrl(url) {
+        if (typeof NativeBridge !== 'undefined' && NativeBridge !== null && NativeBridge.openBrowser) {
+            NativeBridge.openBrowser(url);
+        } else {
+            window.open(url, '_blank');
+        }
+    }
+
+    // Show a small bottom toast above navigation bar
+    function showBottomToast(msg, duration) {
+        duration = duration || 800;
+        var toast = document.createElement('div');
+        toast.className = 'toast bottom';
+        toast.textContent = msg;
+        document.body.appendChild(toast);
+        setTimeout(function() {
+            toast.classList.add('out');
+            setTimeout(function() { toast.remove(); }, 200);
+        }, duration);
+    }
+
+    // ===== DATA =====
+    const ICONS = ['file-text','shield','heart-pulse','car','home','plane','briefcase','user','users','baby','stethoscope','pill','receipt','banknote','file-check','clipboard-list','scan-line','id-card','stamp','folder','image','camera','scan','file-plus','file-search'];
+    const ICON_COLORS = ['#4F8EFF','#34A853','#EA4335','#FBBC04','#9C27B0','#00BCD4','#FF5722','#795548','#607D8B','#E91E63'];
+
+    const defaultPresets = [
+        {id:'id_card',name:'身份证',icon:'id-card'},
+        {id:'bank_card',name:'银行卡',icon:'credit-card'},
+        {id:'household',name:'户口本',icon:'book-open'},
+        {id:'birth_cert',name:'出生证',icon:'baby'},
+        {id:'title_deed',name:'房产证',icon:'home'},
+        {id:'medical_record',name:'病历',icon:'stethoscope'},
+        {id:'discharge_summary',name:'出院小结',icon:'clipboard-list'}
+    ];
+    let presets = JSON.parse(localStorage.getItem('ck_presets') || 'null') || defaultPresets;
+    function savePresets() { localStorage.setItem('ck_presets', JSON.stringify(presets)); }
+
+    let templates = JSON.parse(localStorage.getItem('ck_templates') || 'null') || [
+        {id:'tpl_1',name:'证件收集',desc:'常用证件材料收集',icon:'heart-pulse',iconColor:'#EA4335',iconBg:'#FCE8E6',types:['id_card','medical_record','discharge_summary','bank_card']}
+    ];
+
+    let customTypes = JSON.parse(localStorage.getItem('ck_custom_types') || '[]');
+    let historyRecords = JSON.parse(localStorage.getItem('ck_history') || '[]');
+    // Restore hasPhotos flag from separate photo storage
+    historyRecords.forEach(r => {
+        if (r.id && r.hasPhotos) {
+            const hasMainKey = !!localStorage.getItem('ck_hist_photos_' + r.id);
+            const hasPerTypeKey = !!localStorage.getItem('ck_hp_keys_' + r.id);
+            r.hasPhotos = hasMainKey || hasPerTypeKey;
+        }
+    });
+
+    let docPhotos = {};   // { docTypeId: [base64, base64, ...] }
+    let photoRotations = {};  // { "docType_index": rotationDeg } - persistent rotation per photo
+    let currentTemplate = null;
+    let currentDocType = null;
+    let isPacked = false;
+    let editTemplateId = null;
+    let deleteTemplateId = null;
+    let deleteTypeId = null;
+    let deleteTypeIsPreset = false;
+    let editingTypeId = null;
+    let editingTypeIsPreset = false;
+    let selectedIcon = 'file-text';
+    let selectedTypes = [];
+    let photoPressTimer = null;
+    let previewRotation = 0;
+    let previewDocType = null;
+    let previewPhotoIndex = null;
+    let addPhotoDocType = null;
+    let deleteHistoryId = null;
+    let viewHistoryId = null;
+    // Naming mode: 'type' = by doc type name (身份证_01.jpg), 'order' = by capture order (01.jpg)
+    let namingMode = localStorage.getItem('ck_naming_mode') || 'type';
+    // Pack mode: 'folder' = by doc type folders, 'flat' = all photos in root
+    let packMode = localStorage.getItem('ck_pack_mode') || 'flat';
+    // Timestamp in zip name: 'off' = no timestamp (auto-add if duplicate), 'on' = always add
+    let timestampMode = localStorage.getItem('ck_timestamp_mode') || 'off';
+    let previewScale = 1;
+    let previewStartScale = 1;
+    let previewPinchStartDist = 0;
+    let previewTouchStartX = 0;
+    let previewTouchStartY = 0;
+    let previewTranslateX = 0;
+    let previewTranslateY = 0;
+    let previewStartTranslateX = 0;
+    let previewStartTranslateY = 0;
+    let previewTouchCount = 0;
+
+    // ===== NATIVE BRIDGE =====
+    const isAndroid = typeof NativeBridge !== 'undefined' && NativeBridge !== null;
+
+    function callNative(method, ...args) {
+        if (isAndroid && NativeBridge[method]) {
+            NativeBridge[method](...args);
+            return true;
+        }
+        return false;
+    }
+
+    // Native callback: camera result (now receives file path)
+    window.onCameraResult = function(docType, photoIndex, filePath) {
+        if (!filePath) return;
+        if (!docPhotos[docType]) docPhotos[docType] = [];
+        if (photoIndex >= 0 && photoIndex < docPhotos[docType].length) {
+            docPhotos[docType][photoIndex] = filePath;
+        } else {
+            docPhotos[docType].push(filePath);
+        }
+        isPacked = false;
+        renderCurrentView();
+    };
+
+    // Native callback: single album pick result (now receives file path)
+    window.onAlbumResult = function(docType, photoIndex, filePath) {
+        if (!filePath) return;
+        if (!docPhotos[docType]) docPhotos[docType] = [];
+        if (photoIndex >= 0 && photoIndex < docPhotos[docType].length) {
+            docPhotos[docType][photoIndex] = filePath;
+        } else {
+            docPhotos[docType].push(filePath);
+        }
+        isPacked = false;
+        renderCurrentView();
+    };
+
+    // Native callback: multi album pick progress (serial, one at a time)
+    window.onAlbumMultiProgress = function(docType, filePath, current, total) {
+        if (!filePath) return;
+        if (!docPhotos[docType]) docPhotos[docType] = [];
+        docPhotos[docType].push(filePath);
+        isPacked = false;
+        // Show progress
+        showUploadProgress(current, total);
+        renderCurrentView();
+    };
+
+    // Native callback: multi album pick complete
+    window.onAlbumMultiComplete = function(docType) {
+        hideUploadProgress();
+    };
+
+    // Upload progress UI (dialog style)
+    function showUploadProgress(current, total) {
+        var dialog = document.getElementById('upload-progress-dialog');
+        var fill = document.getElementById('upload-progress-fill');
+        var text = document.getElementById('upload-progress-text');
+        var pct = document.getElementById('upload-progress-pct');
+        if (!dialog) return;
+        dialog.style.display = 'flex';
+        var percent = Math.round(current / total * 100);
+        fill.style.width = percent + '%';
+        text.textContent = '正在处理照片 ' + current + '/' + total;
+        pct.textContent = percent + '%';
+    }
+    function hideUploadProgress() {
+        var dialog = document.getElementById('upload-progress-dialog');
+        if (dialog) setTimeout(function() { dialog.style.display = 'none'; }, 300);
+    }
+
+    // Helper: get photo src URL (supports both file paths and base64)
+    function getPhotoSrc(photo) {
+        if (!photo) return '';
+        if (photo.startsWith('/') || photo.startsWith('file://')) {
+            return 'file://' + photo.replace(/^file:\/\//, '');
+        }
+        return 'data:image/jpeg;base64,' + photo;
+    }
+
+    // Helper: check if photo is a file path (not base64)
+    function isFilePath(photo) {
+        return photo && (photo.startsWith('/') || photo.startsWith('file://'));
+    }
+
+    // Fallback: file input for non-Android
+    function createFileInput(docType, photoIndex, multiple) {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        if (multiple) input.multiple = true;
+        input.onchange = function(e) {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const base64 = ev.target.result.split(',')[1];
+                    if (!docPhotos[docType]) docPhotos[docType] = [];
+                    if (!multiple && photoIndex >= 0 && photoIndex < docPhotos[docType].length) {
+                        docPhotos[docType][photoIndex] = base64;
+                    } else {
+                        docPhotos[docType].push(base64);
+                    }
+                    isPacked = false;
+                    renderCurrentView();
+                };
+                reader.readAsDataURL(file);
+            });
+        };
+        input.click();
+    }
+
+    function openCamera(docType, photoIndex) {
+        if (!callNative('openCamera', docType, photoIndex)) {
+            createFileInput(docType, photoIndex, false);
+        }
+    }
+
+    function openAlbum(docType, photoIndex) {
+        if (!callNative('openAlbum', docType, photoIndex)) {
+            createFileInput(docType, photoIndex, false);
+        }
+    }
+
+    function openAlbumMulti(docType) {
+        if (!callNative('openAlbumMulti', docType)) {
+            createFileInput(docType, -1, true);
+        }
+    }
+
+    // Show add photo dialog (camera / album multi-select)
+    function showAddPhotoDialog(docType) {
+        addPhotoDocType = docType;
+        showDialog('add-photo-dialog');
+    }
+
+    // ===== NAVIGATION =====
+    const primaryTabs = ['home', 'template', 'settings']; // tabs with bottom nav
+    const secondaryScreens = ['collection', 'doc-detail', 'history', 'type-manager']; // screens without bottom nav
+    let navStack = ['home']; // navigation stack for back press
+
+    function switchTab(tab) {
+        // If currently on collection page with unsaved data, prompt first
+        const activeScreen = document.querySelector('.screen.active');
+        if (activeScreen && activeScreen.id === 'tab-collection' && !isPacked) {
+            const hasAny = Object.values(docPhotos).some(arr => arr && arr.length > 0);
+            if (hasAny && !primaryTabs.includes(tab) === false) {
+                // Switching away from collection with data - save temp and proceed
+                saveTempData();
+            }
+        }
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        const screen = document.getElementById('tab-' + tab);
+        if (screen) screen.classList.add('active');
+        const navMap = { home: 0, template: 1, settings: 2 };
+        const navItems = document.querySelectorAll('.nav-item');
+        if (navMap[tab] !== undefined && navItems[navMap[tab]]) navItems[navMap[tab]].classList.add('active');
+        // Show/hide bottom nav based on screen level
+        updateBottomNavVisibility(tab);
+        if (tab === 'home') renderHomeList();
+        if (tab === 'template') renderTemplateList();
+        if (tab === 'settings') renderSettingsCustomTypes();
+        if (tab === 'history') renderHistoryList();
+        if (tab === 'type-manager') renderTypeManager();
+        lucide.createIcons();
+        // Track navigation
+        if (primaryTabs.includes(tab)) {
+            navStack = [tab]; // primary tab resets stack
+        } else {
+            if (navStack[navStack.length - 1] !== tab) navStack.push(tab);
+        }
+    }
+
+    function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        // Determine tab name from screen id
+        const tabName = id.replace('tab-', '');
+        updateBottomNavVisibility(tabName);
+        lucide.createIcons();
+        // Track navigation
+        if (navStack[navStack.length - 1] !== tabName) navStack.push(tabName);
+    }
+
+    function updateBottomNavVisibility(tabName) {
+        const bottomNav = document.querySelector('.bottom-nav');
+        if (primaryTabs.includes(tabName)) {
+            bottomNav.style.display = 'flex';
+        } else {
+            bottomNav.style.display = 'none';
+        }
+    }
+
+    // ===== ANDROID BACK PRESS =====
+    function handleBackPress() {
+        try {
+            // Check if any dialog is open
+            const openDialog = document.querySelector('.overlay.active');
+            if (openDialog) {
+                openDialog.classList.remove('active');
+                return true;
+            }
+            // Check if on collection page - use dedicated back handler
+            const activeScreen = document.querySelector('.screen.active');
+            if (activeScreen && activeScreen.id === 'tab-collection') {
+                handleCollectionBack();
+                return true;
+            }
+            // Check if on doc-detail page - use dedicated back handler
+            if (activeScreen && activeScreen.id === 'tab-doc-detail') {
+                handleDocDetailBack();
+                return true;
+            }
+            // Use navigation stack for back navigation
+            if (navStack.length > 1) {
+                navStack.pop(); // remove current
+                const prevTab = navStack[navStack.length - 1];
+                // Navigate to previous screen
+                document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+                const screen = document.getElementById('tab-' + prevTab);
+                if (screen) screen.classList.add('active');
+                updateBottomNavVisibility(prevTab);
+                // Update nav active state for primary tabs
+                const navMap = { home: 0, template: 1, settings: 2 };
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(n => n.classList.remove('active'));
+                if (navMap[prevTab] !== undefined && navItems[navMap[prevTab]]) navItems[navMap[prevTab]].classList.add('active');
+                // Render content if needed
+                if (prevTab === 'home') renderHomeList();
+                if (prevTab === 'template') renderTemplateList();
+                if (prevTab === 'settings') renderSettingsCustomTypes();
+                if (prevTab === 'history') renderHistoryList();
+                if (prevTab === 'collection') { renderDocGrid(); updatePackButton(); }
+                lucide.createIcons();
+                return true;
+            }
+            // On home tab with empty stack, allow app to exit
+            // But if on other primary tabs, go to home first
+            if (activeScreen) {
+                const screenId = activeScreen.id;
+                const tabName = screenId.replace('tab-', '');
+                if (primaryTabs.includes(tabName) && tabName !== 'home') {
+                    switchTab('home');
+                    return true;
+                }
+            }
+            return false;
+        } catch(e) {
+            // If any error occurs, try to go to home as fallback
+            try { switchTab('home'); } catch(e2) {}
+            return true;
+        }
+    }
+
+    // ===== DIALOG =====
+    function showDialog(id) {
+        document.getElementById(id).classList.add('active');
+        lucide.createIcons();
+    }
+    function hideDialog(id) { document.getElementById(id).classList.remove('active'); }
+
+    // ===== HOME PAGE =====
+    function renderHomeList() {
+        const container = document.getElementById('home-template-list');
+        if (!templates.length) {
+            container.innerHTML = '<div class="empty-state"><i data-lucide="layout-template" style="width:48px;height:48px;"></i><p>暂无模板，点击右上角创建</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        container.innerHTML = templates.map(t => `
+            <div class="card" style="margin-bottom:12px;">
+                <div class="template-item" onclick="startCollection('${t.id}')">
+                    <div style="width:48px;height:48px;border-radius:14px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+                        <i data-lucide="${t.icon}" style="width:24px;height:24px;color:${t.iconColor};"></i>
+                        ${loadTempData('${t.id}') ? '<div style="position:absolute;top:-4px;right:-4px;width:12px;height:12px;border-radius:50%;background:var(--warning);border:2px solid var(--surface);"></div>' : ''}
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:16px;font-weight:600;color:var(--text-1);">${t.name}${loadTempData('${t.id}') ? ' <span style="font-size:11px;color:var(--warning);font-weight:500;">有暂存</span>' : ''}</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
+                    </div>
+                    <i data-lucide="chevron-right" style="width:20px;height:20px;color:var(--text-3);flex-shrink:0;"></i>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    // ===== HISTORY PAGE =====
+    function renderHistoryList() {
+        const container = document.getElementById('history-list');
+        if (!historyRecords.length) {
+            container.innerHTML = '<div class="empty-state"><i data-lucide="clock" style="width:48px;height:48px;"></i><p>暂无历史记录</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        container.innerHTML = historyRecords.map((r, i) => `
+            <div class="card" style="margin-bottom:12px;">
+                <div class="template-item" onclick="viewHistory('${r.id}')">
+                    <div style="width:44px;height:44px;border-radius:12px;background:var(--success-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i data-lucide="archive" style="width:20px;height:20px;color:var(--success);"></i>
+                    </div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:15px;font-weight:600;color:var(--text-1);">${r.packageName || r.templateName}</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${r.typeCount}种证件 · ${r.photoCount}张照片</div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${r.date}</div>
+                    </div>
+                </div>
+                <div style="display:flex;border-top:1px solid var(--border);">
+                    <button style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--primary);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="viewHistory('${r.id}')"><i data-lucide="eye" style="width:14px;height:14px;"></i> 查看</button>
+                    <button style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--success);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="reShareFromHistory('${r.id}')"><i data-lucide="share-2" style="width:14px;height:14px;"></i> 再分享</button>
+                    <button style="flex:1;padding:12px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--error);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;" onclick="deleteHistory('${r.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> 删除</button>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function viewHistory(id) {
+        const r = historyRecords.find(x => x.id === id);
+        if (!r) return;
+        viewHistoryId = id;
+        // Load photos from separate storage (main key or per-type keys)
+        let photos = {};
+        if (r.hasPhotos) {
+            try { photos = JSON.parse(localStorage.getItem('ck_hist_photos_' + id) || '{}'); } catch(e) {}
+            // If main key is empty, try per-type keys
+            if (Object.keys(photos).length === 0) {
+                try {
+                    const typeKeys = JSON.parse(localStorage.getItem('ck_hp_keys_' + id) || '[]');
+                    typeKeys.forEach(typeName => {
+                        try { photos[typeName] = JSON.parse(localStorage.getItem('ck_hp_' + id + '_' + typeName) || '[]'); } catch(e2) {}
+                    });
+                } catch(e3) {}
+            }
+        }
+        document.getElementById('history-detail-title').textContent = r.packageName || r.templateName;
+        let html = `
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <div style="width:36px;height:36px;border-radius:10px;background:var(--success-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="archive" style="width:18px;height:18px;color:var(--success);"></i></div>
+                <div>
+                    <div style="font-size:14px;font-weight:600;color:var(--text-1);">${r.packageName || r.templateName}</div>
+                    <div style="font-size:12px;color:var(--text-3);">${r.date}</div>
+                </div>
+            </div>
+            <div style="font-size:13px;color:var(--text-2);margin-bottom:8px;">
+                共 <b style="color:var(--text-1);">${r.typeCount}</b> 种证件，<b style="color:var(--text-1);">${r.photoCount}</b> 张照片
+            </div>
+        `;
+        if (r.details && r.details.length > 0) {
+            html += '<div style="margin-top:8px;">';
+            r.details.forEach(d => {
+                html += `<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--border);">
+                    <span style="font-size:13px;color:var(--text-1);">${d.name}</span>
+                    <span style="font-size:13px;color:var(--primary);font-weight:600;">${d.count}张</span>
+                </div>`;
+                // Show photo thumbnails if available
+                if (photos[d.name] && photos[d.name].length > 0) {
+                    html += '<div style="display:flex;gap:6px;padding:4px 0 8px;flex-wrap:wrap;">';
+                    photos[d.name].forEach((photo, pIdx) => {
+                        html += `<div style="width:56px;height:56px;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;position:relative;" onclick="previewHistoryPhoto('${id}','${d.name}',${pIdx})">
+                            <img src="${getPhotoSrc(photo)}" style="width:100%;height:100%;object-fit:cover;">
+                        </div>`;
+                    });
+                    html += '</div>';
+                }
+            });
+            html += '</div>';
+        }
+        document.getElementById('history-detail-content').innerHTML = html;
+        lucide.createIcons();
+        showDialog('history-detail-dialog');
+    }
+
+    function previewHistoryPhoto(historyId, typeName, photoIndex) {
+        const r = historyRecords.find(x => x.id === historyId);
+        if (!r) return;
+        // Load photos from separate storage (main key or per-type keys)
+        let photos = {};
+        if (r.hasPhotos) {
+            try { photos = JSON.parse(localStorage.getItem('ck_hist_photos_' + historyId) || '{}'); } catch(e) {}
+            if (Object.keys(photos).length === 0) {
+                try {
+                    const typeKeys = JSON.parse(localStorage.getItem('ck_hp_keys_' + historyId) || '[]');
+                    typeKeys.forEach(tn => {
+                        try { photos[tn] = JSON.parse(localStorage.getItem('ck_hp_' + historyId + '_' + tn) || '[]'); } catch(e2) {}
+                    });
+                } catch(e3) {}
+            }
+        }
+        if (!photos[typeName]) return;
+        const typePhotos = photos[typeName];
+        if (!typePhotos[photoIndex]) return;
+        previewDocType = null;
+        previewPhotoIndex = null;
+        // Store history photo data for preview
+        window._historyPreviewPhotos = typePhotos;
+        window._historyPreviewIndex = photoIndex;
+        previewRotation = 0;
+        previewScale = 1;
+        previewTranslateX = 0;
+        previewTranslateY = 0;
+        const img = document.getElementById('photo-preview-img');
+        img.src = getPhotoSrc(typePhotos[photoIndex]);
+        updatePreviewTransform();
+        // Hide history detail dialog first (preview has higher z-index)
+        hideDialog('history-detail-dialog');
+        showDialog('photo-preview-dialog');
+        setupPreviewGestures();
+    }
+
+    function reShareHistory() {
+        if (!viewHistoryId) return;
+        const r = historyRecords.find(x => x.id === viewHistoryId);
+        if (!r) return;
+        hideDialog('history-detail-dialog');
+        if (r.filePath && isAndroid) {
+            callNative('reSharePackage', r.filePath);
+        } else {
+            showToast('此记录的打包文件已不可用，请重新收集并打包', 'theme');
+        }
+    }
+
+    function editFromHistory() {
+        if (!viewHistoryId) return;
+        const r = historyRecords.find(x => x.id === viewHistoryId);
+        if (!r) return;
+        // Load photos from separate storage (main key or per-type keys)
+        let photos = {};
+        if (r.hasPhotos) {
+            try { photos = JSON.parse(localStorage.getItem('ck_hist_photos_' + viewHistoryId) || '{}'); } catch(e) {}
+            if (Object.keys(photos).length === 0) {
+                try {
+                    const typeKeys = JSON.parse(localStorage.getItem('ck_hp_keys_' + viewHistoryId) || '[]');
+                    typeKeys.forEach(tn => {
+                        try { photos[tn] = JSON.parse(localStorage.getItem('ck_hp_' + viewHistoryId + '_' + tn) || '[]'); } catch(e2) {}
+                    });
+                } catch(e3) {}
+            }
+        }
+        if (!photos || Object.keys(photos).length === 0) {
+            showToast('此记录没有照片数据，无法继续编辑', 'theme');
+            return;
+        }
+        hideDialog('history-detail-dialog');
+        // Find matching template by name
+        const allTypes = [...presets, ...customTypes];
+        let tpl = templates.find(t => t.name === r.templateName);
+        if (!tpl) {
+            // Template not found, use first template or create a mapping
+            tpl = templates[0];
+        }
+        if (!tpl) {
+            showToast('未找到对应模板，请先创建模板', 'warning');
+            return;
+        }
+        // Load photos from history into docPhotos
+        currentTemplate = tpl;
+        docPhotos = {};
+        isPacked = false;
+        // Map photo type names back to type IDs
+        Object.keys(photos).forEach(typeName => {
+            const typeObj = allTypes.find(t => t.name === typeName);
+            if (typeObj) {
+                docPhotos[typeObj.id] = photos[typeName];
+            }
+        });
+        document.getElementById('collection-title').textContent = currentTemplate.name;
+        renderDocGrid();
+        updatePackButton();
+        showScreen('tab-collection');
+    }
+
+    function reShareFromHistory(id) {
+        const r = historyRecords.find(x => x.id === id);
+        if (!r) return;
+        if (r.filePath && isAndroid) {
+            callNative('reSharePackage', r.filePath);
+        } else {
+            showToast('此记录的打包文件已不可用，请重新收集并打包', 'theme');
+        }
+    }
+
+    function deleteHistory(id) {
+        deleteHistoryId = id;
+        showDialog('delete-history-dialog');
+    }
+
+    function confirmDeleteHistory() {
+        // Remove separate photo storage (main key + per-type keys)
+        localStorage.removeItem('ck_hist_photos_' + deleteHistoryId);
+        localStorage.removeItem('ck_hp_keys_' + deleteHistoryId);
+        // Remove per-type photo keys
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('ck_hp_' + deleteHistoryId + '_')) keysToRemove.push(key);
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        // Also clean up any orphaned photo keys from old versions
+        const allKeysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            // Find photo keys that don't belong to any existing history record
+            if (key && (key.startsWith('ck_hist_photos_') || key.startsWith('ck_hp_keys_') || key.startsWith('ck_hp_hist_'))) {
+                const recordId = key.replace('ck_hist_photos_', '').replace('ck_hp_keys_', '').replace('ck_hp_', '').split('_')[0];
+                if (key.startsWith('ck_hp_') && !key.startsWith('ck_hp_keys_')) {
+                    // Per-type key: ck_hp_hist_xxx_typeName, extract hist_xxx
+                    const match = key.match(/^ck_hp_(hist_\d+)/);
+                    if (match && !historyRecords.some(r => r.id === match[1])) {
+                        allKeysToRemove.push(key);
+                    }
+                } else if (key.startsWith('ck_hist_photos_')) {
+                    const rid = key.replace('ck_hist_photos_', '');
+                    if (!historyRecords.some(r => r.id === rid) && rid !== deleteHistoryId) {
+                        allKeysToRemove.push(key);
+                    }
+                } else if (key.startsWith('ck_hp_keys_')) {
+                    const rid = key.replace('ck_hp_keys_', '');
+                    if (!historyRecords.some(r => r.id === rid) && rid !== deleteHistoryId) {
+                        allKeysToRemove.push(key);
+                    }
+                }
+            }
+        }
+        allKeysToRemove.forEach(k => localStorage.removeItem(k));
+        // Delete the packaged ZIP file via native
+        const record = historyRecords.find(r => r.id === deleteHistoryId);
+        if (record && record.filePath && isAndroid) {
+            callNative('deleteFile', record.filePath);
+        }
+        historyRecords = historyRecords.filter(r => r.id !== deleteHistoryId);
+        localStorage.setItem('ck_history', JSON.stringify(historyRecords));
+        renderHistoryList();
+        hideDialog('delete-history-dialog');
+    }
+
+    // Calculate approximate localStorage usage in KB
+    function getStorageUsageKB() {
+        let total = 0;
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key) {
+                total += key.length + (localStorage.getItem(key) || '').length;
+            }
+        }
+        return Math.round(total * 2 / 1024); // UTF-16 = 2 bytes per char
+    }
+
+    // Clean up orphaned and temporary data
+    function cleanupOrphanedData() {
+        const keysToRemove = [];
+        const validIds = new Set(historyRecords.map(r => r.id));
+        const validTemplateIds = new Set(templates.map(t => t.id));
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            // Clean orphaned history photo keys
+            if (key.startsWith('ck_hist_photos_')) {
+                const rid = key.replace('ck_hist_photos_', '');
+                if (!validIds.has(rid)) keysToRemove.push(key);
+            } else if (key.startsWith('ck_hp_keys_')) {
+                const rid = key.replace('ck_hp_keys_', '');
+                if (!validIds.has(rid)) keysToRemove.push(key);
+            } else if (key.startsWith('ck_hp_hist_')) {
+                const match = key.match(/^ck_hp_(hist_\d+)/);
+                if (match && !validIds.has(match[1])) keysToRemove.push(key);
+            }
+            // Clean orphaned temp data
+            if (key.startsWith('ck_temp_tpl_')) {
+                const tplId = key.replace('ck_temp_tpl_', '');
+                if (!validTemplateIds.has(tplId)) keysToRemove.push(key);
+            }
+        }
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        return keysToRemove.length;
+    }
+
+    // Format file size: KB no decimals, MB/GB with 2 decimal places
+    function formatFileSize(kb) {
+        if (kb < 1024) return kb + ' KB';
+        if (kb < 1024 * 1024) return (kb / 1024).toFixed(2) + ' MB';
+        return (kb / (1024 * 1024)).toFixed(2) + ' GB';
+    }
+
+    // Clear all cache data - show confirmation dialog first
+    function clearAllCache() {
+        let photoKeys = 0, tempKeys = 0, historyCount = historyRecords.length;
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            if (key.startsWith('ck_hist_photos_') || key.startsWith('ck_hp_keys_') || key.match(/^ck_hp_hist_\d+/)) photoKeys++;
+            else if (key.startsWith('ck_temp_tpl_')) tempKeys++;
+        }
+        const sizeKB = getStorageUsageKB();
+        // Get external storage sizes
+        let photosSizeKB = 0, historySizeKB = 0, packagesSizeKB = 0;
+        if (isAndroid && NativeBridge.getPhotosSizeKB) photosSizeKB = NativeBridge.getPhotosSizeKB();
+        if (isAndroid && NativeBridge.getHistorySizeKB) historySizeKB = NativeBridge.getHistorySizeKB();
+        if (isAndroid && NativeBridge.getPackagesSizeKB) packagesSizeKB = NativeBridge.getPackagesSizeKB();
+        const externalTotalKB = photosSizeKB + historySizeKB + packagesSizeKB;
+        const info = document.getElementById('cache-info');
+        info.innerHTML = '<div style="margin-bottom:8px;">📊 数据概况</div>' +
+            '<div>历史记录：' + historyCount + ' 条</div>' +
+            '<div>照片缓存：' + photoKeys + ' 项 (' + formatFileSize(photosSizeKB) + ')</div>' +
+            '<div>历史文件：' + formatFileSize(historySizeKB) + '</div>' +
+            '<div>打包文件：' + formatFileSize(packagesSizeKB) + '</div>' +
+            '<div>临时数据：' + tempKeys + ' 项</div>' +
+            '<div>内部存储：约 ' + formatFileSize(sizeKB) + '</div>' +
+            (externalTotalKB > 0 ? '<div>外部存储：约 ' + formatFileSize(externalTotalKB) + '</div>' : '');
+        showDialog('clear-cache-dialog');
+    }
+
+    function confirmClearCache() {
+        let photoKeys = 0, tempKeys = 0, orphanKeys = 0;
+        const keysToRemove = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (!key) continue;
+            if (key.startsWith('ck_hist_photos_') || key.startsWith('ck_hp_keys_') || key.match(/^ck_hp_hist_\d+/)) {
+                photoKeys++;
+                keysToRemove.push(key);
+            } else if (key.startsWith('ck_temp_tpl_')) {
+                tempKeys++;
+                keysToRemove.push(key);
+            }
+        }
+        orphanKeys = cleanupOrphanedData();
+        keysToRemove.forEach(k => localStorage.removeItem(k));
+        historyRecords.forEach(r => { r.hasPhotos = false; r.filePath = ''; });
+        localStorage.setItem('ck_history', JSON.stringify(historyRecords));
+        // Delete external files
+        if (isAndroid) {
+            if (NativeBridge.deleteAllPhotos) NativeBridge.deleteAllPhotos();
+            if (NativeBridge.deleteAllHistory) NativeBridge.deleteAllHistory();
+            if (NativeBridge.deleteAllPackages) NativeBridge.deleteAllPackages();
+        }
+        const total = photoKeys + tempKeys + orphanKeys;
+        hideDialog('clear-cache-dialog');
+        showToast('清理完成！共清理' + total + '项', 'success', 3000);
+        renderHistoryList();
+    }
+
+    // ===== TEMPLATE MANAGEMENT =====
+    function renderTemplateList() {
+        const container = document.getElementById('template-list');
+        if (!templates.length) {
+            container.innerHTML = '<div class="empty-state"><i data-lucide="layout-template" style="width:48px;height:48px;"></i><p>暂无模板</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        container.innerHTML = templates.map(t => `
+            <div class="card" style="margin-bottom:12px;">
+                <div style="display:flex;align-items:center;">
+                    <div class="template-item" style="flex:1;min-width:0;" onclick="startCollection('${t.id}')">
+                        <div style="width:48px;height:48px;border-radius:14px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i data-lucide="${t.icon}" style="width:24px;height:24px;color:${t.iconColor};"></i>
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:16px;font-weight:600;color:var(--text-1);">${t.name}</div>
+                            <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
+                            <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-left:1px solid var(--border);flex-shrink:0;">
+                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();editTemplate('${t.id}')"><i data-lucide="pencil" style="width:15px;height:15px;color:var(--primary);"></i></button>
+                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();exportTemplate('${t.id}')"><i data-lucide="share-2" style="width:15px;height:15px;color:var(--success);"></i></button>
+                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();deleteTemplate('${t.id}')"><i data-lucide="trash-2" style="width:15px;height:15px;color:var(--error);"></i></button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function showNewTemplateDialog() {
+        editTemplateId = null;
+        document.getElementById('edit-dialog-title').textContent = '新建模板';
+        document.getElementById('tpl-name-input').value = '';
+        document.getElementById('tpl-desc-input').value = '';
+        selectedIcon = 'file-text';
+        selectedTypes = [];
+        renderTemplateIconPicker();
+        renderTypePicker();
+        showDialog('edit-template-dialog');
+    }
+
+    function editTemplate(id) {
+        const t = templates.find(x => x.id === id);
+        if (!t) return;
+        editTemplateId = id;
+        document.getElementById('edit-dialog-title').textContent = '编辑模板';
+        document.getElementById('tpl-name-input').value = t.name;
+        document.getElementById('tpl-desc-input').value = t.desc || '';
+        selectedIcon = t.icon;
+        selectedTypes = [...t.types];
+        renderTemplateIconPicker();
+        renderTypePicker();
+        showDialog('edit-template-dialog');
+    }
+
+    function deleteTemplate(id) {
+        deleteTemplateId = id;
+        showDialog('delete-tpl-dialog');
+    }
+
+    function confirmDeleteTemplate() {
+        templates = templates.filter(t => t.id !== deleteTemplateId);
+        saveTemplates();
+        renderTemplateList();
+        renderHomeList();
+        hideDialog('delete-tpl-dialog');
+    }
+
+    function saveTemplate() {
+        const name = document.getElementById('tpl-name-input').value.trim();
+        const desc = document.getElementById('tpl-desc-input').value.trim();
+        if (!name) { showToast('请输入模板名称', 'warning'); return; }
+        if (!selectedTypes.length) { showToast('请选择至少一种证件类型', 'warning'); return; }
+        const colorIdx = Math.floor(Math.random() * ICON_COLORS.length);
+        if (editTemplateId) {
+            const t = templates.find(x => x.id === editTemplateId);
+            if (t) { t.name = name; t.desc = desc; t.icon = selectedIcon; t.types = [...selectedTypes]; t.iconColor = ICON_COLORS[colorIdx]; t.iconBg = ICON_COLORS[colorIdx] + '18'; }
+        } else {
+            templates.push({ id: 'tpl_' + Date.now(), name, desc, icon: selectedIcon, iconColor: ICON_COLORS[colorIdx], iconBg: ICON_COLORS[colorIdx] + '18', types: [...selectedTypes] });
+        }
+        saveTemplates();
+        renderTemplateList();
+        renderHomeList();
+        hideDialog('edit-template-dialog');
+    }
+
+    function renderTemplateIconPicker() {
+        const container = document.getElementById('tpl-icon-picker');
+        container.innerHTML = ICONS.map(icon => `
+            <div class="icon-picker-item ${icon === selectedIcon ? 'selected' : ''}" onclick="selectedIcon='${icon}';renderTemplateIconPicker();">
+                <i data-lucide="${icon}" style="width:20px;height:20px;color:${icon === selectedIcon ? 'var(--primary)' : 'var(--text-2)'};"></i>
+            </div>
+        `).join('');
+        lucide.createIcons();
+    }
+
+    function renderTypePicker() {
+        const allTypes = [...presets, ...customTypes];
+        const container = document.getElementById('tpl-type-picker');
+        container.innerHTML = allTypes.map(t => {
+            const sel = selectedTypes.includes(t.id);
+            return `<button style="padding:6px 12px;border-radius:8px;border:1.5px solid ${sel ? 'var(--primary)' : 'var(--border)'};background:${sel ? 'var(--primary-light)' : 'var(--surface)'};color:${sel ? 'var(--primary)' : 'var(--text-2)'};font-size:13px;font-weight:500;cursor:pointer;" onclick="toggleType('${t.id}')">${t.name}</button>`;
+        }).join('');
+    }
+
+    function toggleType(id) {
+        const idx = selectedTypes.indexOf(id);
+        if (idx >= 0) selectedTypes.splice(idx, 1); else selectedTypes.push(id);
+        renderTypePicker();
+    }
+
+    function saveTemplates() { localStorage.setItem('ck_templates', JSON.stringify(templates)); }
+
+    // ===== TEMPLATE IMPORT/EXPORT =====
+    function exportTemplate(id) {
+        const t = templates.find(x => x.id === id);
+        if (!t) return;
+        const exportData = {
+            version: 2,
+            app: 'CollectorKing',
+            templates: [t],
+            presets: presets,
+            customTypes: customTypes
+        };
+        const json = JSON.stringify(exportData);
+        const fileName = '模板_' + t.name + '_' + new Date().toISOString().slice(0,10) + '.txt';
+        if (isAndroid) {
+            callNative('saveTextFile', fileName, json, '模板: ' + t.name);
+        } else {
+            // Fallback: download as txt file
+            const blob = new Blob([json], {type: 'text/plain;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = fileName; a.click();
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    function exportAllTemplates() {
+        if (!templates.length) { showToast('没有可导出的模板', 'warning'); return; }
+        const exportData = {
+            version: 2,
+            app: 'CollectorKing',
+            templates: templates,
+            presets: presets,
+            customTypes: customTypes
+        };
+        const json = JSON.stringify(exportData);
+        const fileName = '全部模板_' + templates.length + '个_' + new Date().toISOString().slice(0,10) + '.txt';
+        if (isAndroid) {
+            callNative('saveTextFile', fileName, json, '全部模板 (' + templates.length + '个)');
+        } else {
+            // Fallback: download as txt file
+            const blob = new Blob([json], {type: 'text/plain;charset=utf-8'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url; a.download = fileName; a.click();
+            URL.revokeObjectURL(url);
+        }
+    }
+
+    // Native callback for text file import
+    window.onTextFileImported = function(content) {
+        if (!content) { showToast('文件内容为空', 'warning'); return; }
+        try {
+            const data = JSON.parse(content);
+            if (!data || !data.templates || !Array.isArray(data.templates)) {
+                showToast('无效的模板数据格式', 'error');
+                return;
+            }
+            let imported = 0;
+            let importedTypes = 0;
+            let importedPresets = 0;
+            let skipped = 0;
+            let duplicated = 0;
+            // Import presets first (merge by id)
+            if (data.presets && Array.isArray(data.presets)) {
+                data.presets.forEach(p => {
+                    if (!p.id || !p.name) { return; }
+                    const existingIdx = presets.findIndex(t => t.id === p.id);
+                    if (existingIdx >= 0) {
+                        // Update existing preset (name/icon may have changed)
+                        if (presets[existingIdx].name !== p.name || presets[existingIdx].icon !== p.icon) {
+                            presets[existingIdx].name = p.name;
+                            presets[existingIdx].icon = p.icon || 'file';
+                            importedPresets++;
+                        }
+                    } else {
+                        // Check if name already exists in presets or customTypes
+                        const allExisting = [...presets, ...customTypes];
+                        if (!allExisting.some(t => t.name === p.name)) {
+                            presets.push({ id: p.id, name: p.name, icon: p.icon || 'file' });
+                            importedPresets++;
+                        }
+                    }
+                });
+                if (importedPresets > 0) savePresets();
+            }
+            // Import custom types
+            if (data.customTypes && Array.isArray(data.customTypes)) {
+                data.customTypes.forEach(ct => {
+                    if (!ct.id || !ct.name) { return; }
+                    // Check duplicate name against presets and existing custom types
+                    const allExisting = [...presets, ...customTypes];
+                    if (allExisting.some(t => t.name === ct.name)) { return; }
+                    // Check duplicate id
+                    if (customTypes.some(t => t.id === ct.id)) {
+                        ct.id = 'custom_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                    }
+                    if (!ct.icon) ct.icon = 'file';
+                    customTypes.push(ct);
+                    importedTypes++;
+                });
+                localStorage.setItem('ck_custom_types', JSON.stringify(customTypes));
+            }
+            // Import templates
+            data.templates.forEach(t => {
+                if (!t.id || !t.name || !t.types || !Array.isArray(t.types)) {
+                    skipped++;
+                    return;
+                }
+                // Check for identical template (same name + same types)
+                const isDuplicate = templates.some(x => 
+                    x.name === t.name && 
+                    x.types.length === t.types.length && 
+                    t.types.every(type => x.types.includes(type))
+                );
+                if (isDuplicate) {
+                    duplicated++;
+                    return;
+                }
+                const existing = templates.find(x => x.id === t.id);
+                if (existing) {
+                    t.id = 'tpl_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+                }
+                if (!t.icon) t.icon = 'file-text';
+                if (!t.iconColor) t.iconColor = '#4F8EFF';
+                if (!t.iconBg) t.iconBg = '#E8F0FE';
+                if (!t.desc) t.desc = '';
+                templates.push(t);
+                imported++;
+            });
+            saveTemplates();
+            renderTemplateList();
+            renderSettingsCustomTypes();
+            let msg = '成功导入 ' + imported + ' 个模板';
+            if (importedPresets > 0) msg += '、更新 ' + importedPresets + ' 个预设证件类型';
+            if (importedTypes > 0) msg += '、' + importedTypes + ' 个自定义证件类型';
+            if (duplicated > 0) msg += '，跳过 ' + duplicated + ' 个重复模板';
+            if (skipped > 0) msg += '，跳过 ' + skipped + ' 个无效模板';
+            showToast(msg, 'success', 3500);
+        } catch(e) {
+            showToast('解析失败: ' + e.message, 'error');
+        }
+    };
+
+    function showImportTemplateDialog() {
+        if (isAndroid) {
+            // Use native file picker for TXT file
+            callNative('readTextFile', 'onTextFileImported');
+        } else {
+            // Fallback: show textarea dialog for non-Android
+            document.getElementById('import-json-input').value = '';
+            document.getElementById('import-preview').style.display = 'none';
+            showDialog('import-template-dialog');
+        }
+    }
+
+    function confirmImportTemplate() {
+        const jsonStr = document.getElementById('import-json-input').value.trim();
+        if (!jsonStr) { showToast('请粘贴模板数据', 'warning'); return; }
+        // Reuse the same import logic
+        window.onTextFileImported(jsonStr);
+        hideDialog('import-template-dialog');
+    }
+
+    // ===== COLLECTION PAGE =====
+    function startCollection(templateId) {
+        currentTemplate = templates.find(t => t.id === templateId);
+        if (!currentTemplate) return;
+        // Check if there's temp data for this template
+        if (checkTempData(templateId)) {
+            // Update dialog message with template name
+            const msgEl = document.getElementById('temp-data-msg');
+            if (msgEl) msgEl.textContent = '模板"' + currentTemplate.name + '"有未完成的收集数据，是否恢复？';
+            showDialog('temp-data-dialog');
+            return;
+        }
+        docPhotos = {};
+        isPacked = false;
+        document.getElementById('collection-title').textContent = currentTemplate.name;
+        renderDocGrid();
+        updatePackButton();
+        showScreen('tab-collection');
+    }
+
+    function renderDocGrid() {
+        if (!currentTemplate) return;
+        const allTypes = [...presets, ...customTypes];
+        const grid = document.getElementById('doc-grid');
+        grid.innerHTML = currentTemplate.types.map(typeId => {
+            const t = allTypes.find(x => x.id === typeId);
+            if (!t) return '';
+            const photos = docPhotos[typeId] || [];
+            const hasPhoto = photos.length > 0;
+            return `
+                <div class="card doc-btn" style="padding:16px 8px;text-align:center;cursor:pointer;${hasPhoto ? 'border:2px solid var(--success);' : ''}" onclick="openDocDetail('${typeId}')">
+                    <div style="width:40px;height:40px;border-radius:12px;background:${hasPhoto ? 'var(--success-light)' : 'var(--primary-light)'};display:flex;align-items:center;justify-content:center;margin:0 auto 8px;">
+                        <i data-lucide="${t.icon || 'file'}" style="width:20px;height:20px;color:${hasPhoto ? 'var(--success)' : 'var(--primary)'};"></i>
+                    </div>
+                    <div style="font-size:13px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</div>
+                    <div style="font-size:11px;color:${hasPhoto ? 'var(--success)' : 'var(--text-3)'};margin-top:2px;font-weight:500;">${hasPhoto ? photos.length + '张' : '未拍'}</div>
+                </div>
+            `;
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function updatePackButton() {
+        const btn = document.getElementById('pack-btn');
+        const hasAny = Object.values(docPhotos).some(arr => arr && arr.length > 0);
+        btn.disabled = !hasAny || isPacked;
+        // Update photo count display
+        const photoCount = Object.values(docPhotos).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
+        const countEl = document.getElementById('collection-photo-count');
+        if (countEl) countEl.textContent = '已上传 ' + photoCount + ' 张照片';
+    }
+
+    function handlePackClick() {
+        const hasAny = Object.values(docPhotos).some(arr => arr && arr.length > 0);
+        if (!hasAny) { showToast('请先拍摄至少一张证件照片', 'warning'); return; }
+        if (isPacked) return;
+        const allTypes = [...presets, ...customTypes];
+        const typeCount = Object.keys(docPhotos).filter(k => docPhotos[k] && docPhotos[k].length > 0).length;
+        const photoCount = Object.values(docPhotos).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
+        document.getElementById('pack-dialog-msg').textContent = `将打包 ${typeCount} 种证件共 ${photoCount} 张照片，确认打包？`;
+        // Set default package name
+        const nameInput = document.getElementById('pack-name-input');
+        if (!nameInput.value.trim()) {
+            nameInput.value = currentTemplate ? currentTemplate.name : '收集材料';
+        }
+        showDialog('pack-dialog');
+    }
+
+    // ===== DOC DETAIL PAGE =====
+    function openDocDetail(docType) {
+        currentDocType = docType;
+        const allTypes = [...presets, ...customTypes];
+        const t = allTypes.find(x => x.id === docType);
+        document.getElementById('doc-detail-title').textContent = t ? t.name : docType;
+        renderDocDetail();
+        showScreen('tab-doc-detail');
+    }
+
+    function renderDocDetail() {
+        if (!currentDocType) return;
+        const photos = docPhotos[currentDocType] || [];
+        const totalUploaded = Object.values(docPhotos).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
+        document.getElementById('doc-detail-count').textContent = '已上传 ' + totalUploaded + ' 张';
+        document.getElementById('doc-detail-dot').style.background = totalUploaded > 0 ? 'var(--success)' : 'var(--text-3)';
+
+        const container = document.getElementById('doc-detail-content');
+        let html = '';
+
+        // Existing photos
+        photos.forEach((photo, idx) => {
+            const rotKey = currentDocType + '_' + idx;
+            const rotation = photoRotations[rotKey] || 0;
+            const rotStyle = rotation ? 'transform:rotate(' + rotation + 'deg);object-fit:contain;' : '';
+            html += `
+                <div style="margin-bottom:16px;">
+                    <div class="photo-label">第 ${idx + 1} 张 <span class="photo-count">点击预览 · 长按替换</span></div>
+                    <div class="photo-frame-wrap">
+                        <div class="photo-frame has-photo" ontouchstart="startPhotoPress('${currentDocType}',${idx})" ontouchend="cancelPhotoPress()" ontouchcancel="cancelPhotoPress()" onclick="previewPhoto('${currentDocType}',${idx})">
+                            <img class="photo-thumb" src="${getPhotoSrc(photo)}" style="${rotStyle}" onload="adaptRotatedThumb(this,${rotation})">
+                            <div class="photo-overlay"><span>点击预览</span></div>
+                        </div>
+                        <div class="remove-frame" onclick="removePhoto('${currentDocType}',${idx})"><i data-lucide="x" style="width:16px;height:16px;"></i></div>
+                    </div>
+                </div>
+            `;
+        });
+
+        // Add photo slot
+        html += `
+            <div style="margin-bottom:16px;">
+                <div class="photo-label">第 ${photos.length + 1} 张</div>
+                <div class="photo-frame" ontouchstart="startPhotoPress('${currentDocType}',${photos.length})" ontouchend="cancelPhotoPress()" ontouchcancel="cancelPhotoPress()" onclick="handlePhotoClick('${currentDocType}',${photos.length})">
+                    <i data-lucide="camera" style="width:32px;height:32px;color:var(--text-3);margin-bottom:8px;"></i>
+                    <span style="font-size:12px;color:var(--text-3);">单击拍照 · 长按相册多选</span>
+                </div>
+            </div>
+        `;
+
+        // Add more photos button
+        html += `
+            <div style="margin-top:8px;padding:0 4px;">
+                <button class="btn-outlined" style="width:100%;justify-content:center;padding:12px;" onclick="showAddPhotoDialog('${currentDocType}')">
+                    <i data-lucide="plus" style="width:16px;height:16px;"></i> 添加更多照片
+                </button>
+            </div>
+        `;
+
+        container.innerHTML = html;
+        lucide.createIcons();
+    }
+
+    // Adapt rotated thumbnail to fit within photo frame
+    function adaptRotatedThumb(img, rotation, retries) {
+        retries = retries || 0;
+        if (!rotation) return;
+        const frame = img.parentElement;
+        if (!frame) return;
+        const frameW = frame.offsetWidth;
+        const frameH = frame.offsetHeight;
+        if (!frameW || !frameH) {
+            // Frame not laid out yet, retry after layout
+            if (retries < 5) {
+                setTimeout(function() { adaptRotatedThumb(img, rotation, retries + 1); }, 50);
+            }
+            return;
+        }
+        if (rotation === 180) {
+            // 180° rotation: dimensions unchanged, just ensure contain fit
+            img.style.objectFit = 'contain';
+            return;
+        }
+        if (rotation !== 90 && rotation !== 270) return;
+        // Swap dimensions: set img to frameH × frameW, center it, then rotate
+        // After rotation, visual bounding box = frameW × frameH = frame size (perfect fit)
+        img.style.width = frameH + 'px';
+        img.style.height = frameW + 'px';
+        img.style.left = '50%';
+        img.style.top = '50%';
+        img.style.right = 'auto';
+        img.style.bottom = 'auto';
+        img.style.objectFit = 'contain';
+        img.style.transform = 'translate(-50%,-50%) rotate(' + rotation + 'deg)';
+    }
+
+    function renderCurrentView() {
+        const activeScreen = document.querySelector('.screen.active');
+        if (!activeScreen) return;
+        if (activeScreen.id === 'tab-doc-detail') renderDocDetail();
+        if (activeScreen.id === 'tab-collection') { renderDocGrid(); updatePackButton(); }
+    }
+
+    // ===== PHOTO PRESS (long press = album, short press = camera) =====
+    function startPhotoPress(docType, photoIndex) {
+        photoPressTimer = setTimeout(() => {
+            photoPressTimer = null;
+            openAlbum(docType, photoIndex);
+        }, 500);
+    }
+
+    function cancelPhotoPress() {
+        if (photoPressTimer) { clearTimeout(photoPressTimer); photoPressTimer = null; }
+    }
+
+    function handlePhotoClick(docType, photoIndex) {
+        // If timer still running, it was a short tap → camera
+        if (photoPressTimer) { clearTimeout(photoPressTimer); photoPressTimer = null; }
+        // Only open camera if the timer wasn't consumed by long press
+        // The long press handler already called openAlbum and set timer to null
+        // So if we get here with timer already null, it means long press already handled it
+        // We need a flag to track this
+    }
+
+    // Better approach: use a flag
+    let longPressTriggered = false;
+
+    // Override the press handlers
+    function startPhotoPress(docType, photoIndex) {
+        longPressTriggered = false;
+        photoPressTimer = setTimeout(() => {
+            longPressTriggered = true;
+            photoPressTimer = null;
+            openAlbumMulti(docType);
+        }, 500);
+    }
+
+    function cancelPhotoPress() {
+        if (photoPressTimer) { clearTimeout(photoPressTimer); photoPressTimer = null; }
+    }
+
+    function handlePhotoClick(docType, photoIndex) {
+        if (longPressTriggered) { longPressTriggered = false; return; }
+        if (photoPressTimer) { clearTimeout(photoPressTimer); photoPressTimer = null; }
+        openCamera(docType, photoIndex);
+    }
+
+    function removePhoto(docType, index) {
+        if (docPhotos[docType]) {
+            // Delete the photo file if it's a file path
+            const removedPhoto = docPhotos[docType][index];
+            if (isFilePath(removedPhoto) && isAndroid && NativeBridge.deletePhotoFile) {
+                NativeBridge.deletePhotoFile(removedPhoto);
+            }
+            docPhotos[docType].splice(index, 1);
+            // Rebuild photoRotations keys: shift indices after the removed photo
+            const remaining = docPhotos[docType] ? docPhotos[docType].length : 0;
+            const newRots = {};
+            for (let i = 0; i < remaining; i++) {
+                const oldKey = docType + '_' + (i < index ? i : i + 1);
+                const newKey = docType + '_' + i;
+                if (photoRotations[oldKey] !== undefined) {
+                    newRots[newKey] = photoRotations[oldKey];
+                }
+            }
+            // Clean up old keys for this docType
+            Object.keys(photoRotations).forEach(k => {
+                if (k.startsWith(docType + '_')) delete photoRotations[k];
+            });
+            // Assign new keys
+            Object.assign(photoRotations, newRots);
+            if (docPhotos[docType].length === 0) delete docPhotos[docType];
+            isPacked = false;
+            renderDocDetail();
+        }
+    }
+
+    // ===== PHOTO PREVIEW =====
+    function previewPhoto(docType, index) {
+        if (longPressTriggered) { longPressTriggered = false; return; }
+        previewDocType = docType;
+        previewPhotoIndex = index;
+        const rotKey = docType + '_' + index;
+        previewRotation = photoRotations[rotKey] || 0;
+        previewScale = 1;
+        previewTranslateX = 0;
+        previewTranslateY = 0;
+        const photos = docPhotos[docType] || [];
+        if (photos[index]) {
+            const img = document.getElementById('photo-preview-img');
+            img.src = getPhotoSrc(photos[index]);
+            updatePreviewTransform();
+            showDialog('photo-preview-dialog');
+            setupPreviewGestures();
+        }
+    }
+
+    function updatePreviewTransform() {
+        const img = document.getElementById('photo-preview-img');
+        img.style.transform = 'rotate(' + previewRotation + 'deg) scale(' + previewScale + ') translate(' + previewTranslateX + 'px,' + previewTranslateY + 'px)';
+    }
+
+    function setupPreviewGestures() {
+        const container = document.getElementById('photo-preview-container');
+        // Remove old listeners
+        container.ontouchstart = previewTouchStart;
+        container.ontouchmove = previewTouchMove;
+        container.ontouchend = previewTouchEnd;
+        container.ontouchcancel = previewTouchEnd;
+    }
+
+    function previewTouchStart(e) {
+        previewTouchCount = e.touches.length;
+        if (e.touches.length === 2) {
+            // Pinch start
+            previewPinchStartDist = getPinchDistance(e.touches[0], e.touches[1]);
+            previewStartScale = previewScale;
+            previewStartTranslateX = previewTranslateX;
+            previewStartTranslateY = previewTranslateY;
+        } else if (e.touches.length === 1) {
+            previewTouchStartX = e.touches[0].clientX;
+            previewTouchStartY = e.touches[0].clientY;
+            previewStartTranslateX = previewTranslateX;
+            previewStartTranslateY = previewTranslateY;
+        }
+    }
+
+    function previewTouchMove(e) {
+        e.preventDefault();
+        if (e.touches.length === 2) {
+            const dist = getPinchDistance(e.touches[0], e.touches[1]);
+            const scaleDelta = dist / previewPinchStartDist;
+            previewScale = Math.max(0.5, Math.min(5, previewStartScale * scaleDelta));
+            updatePreviewTransform();
+        } else if (e.touches.length === 1 && previewScale > 1.01) {
+            const dx = e.touches[0].clientX - previewTouchStartX;
+            const dy = e.touches[0].clientY - previewTouchStartY;
+            previewTranslateX = previewStartTranslateX + dx / previewScale;
+            previewTranslateY = previewStartTranslateY + dy / previewScale;
+            updatePreviewTransform();
+        }
+    }
+
+    function previewTouchEnd(e) {
+        previewTouchCount = e.touches.length;
+    }
+
+    function getPinchDistance(t1, t2) {
+        const dx = t1.clientX - t2.clientX;
+        const dy = t1.clientY - t2.clientY;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+
+    function rotatePreview() {
+        previewRotation = (previewRotation + 90) % 360;
+        updatePreviewTransform();
+        // Save rotation persistently
+        if (previewDocType !== null && previewPhotoIndex !== null) {
+            const rotKey = previewDocType + '_' + previewPhotoIndex;
+            photoRotations[rotKey] = previewRotation;
+        }
+    }
+
+    function closePreview() {
+        hideDialog('photo-preview-dialog');
+        // If returning from history photo preview, re-show history detail dialog
+        if (window._historyPreviewPhotos) {
+            if (viewHistoryId) {
+                showDialog('history-detail-dialog');
+            }
+            window._historyPreviewPhotos = null;
+            window._historyPreviewIndex = null;
+            return;
+        }
+        // Apply rotation to photo frame thumbnail
+        if (previewDocType !== null && previewPhotoIndex !== null) {
+            renderCurrentView();
+        }
+    }
+
+    function retakePhoto() {
+        hideDialog('photo-preview-dialog');
+        if (previewDocType !== null && previewPhotoIndex !== null) {
+            openCamera(previewDocType, previewPhotoIndex);
+        }
+    }
+
+    // ===== PACKING =====
+    function createThumbnail(photoData, maxDim, quality) {
+        return new Promise((resolve) => {
+            // If it's a file path, no need to create thumbnail - just return the path
+            if (isFilePath(photoData)) {
+                resolve(photoData);
+                return;
+            }
+            const img = new Image();
+            img.onload = function() {
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) {
+                    if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                    else { w = Math.round(w * maxDim / h); h = maxDim; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = w; canvas.height = h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, w, h);
+                const thumb = canvas.toDataURL('image/jpeg', quality);
+                resolve(thumb.replace(/^data:image\/jpeg;base64,/, ''));
+            };
+            img.onerror = function() { resolve(photoData); };
+            img.src = 'data:image/jpeg;base64,' + photoData;
+        });
+    }
+
+    async function createThumbnailsForHistory(photos) {
+        const thumbnails = {};
+        for (const typeName of Object.keys(photos)) {
+            thumbnails[typeName] = [];
+            for (const photo of photos[typeName]) {
+                try {
+                    const thumb = await createThumbnail(photo, 1200, 0.7);
+                    thumbnails[typeName].push(thumb);
+                } catch(e) {
+                    thumbnails[typeName].push(photo);
+                }
+            }
+        }
+        return thumbnails;
+    }
+
+    function startPacking() {
+        const packageName = document.getElementById('pack-name-input').value.trim();
+        if (!packageName) { showToast('请输入打包名称', 'warning'); return; }
+        hideDialog('pack-dialog');
+        showDialog('pack-progress-dialog');
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += Math.random() * 15 + 5;
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                document.getElementById('pack-progress-text').textContent = '打包完成！';
+                document.getElementById('pack-progress-pct').textContent = '100%';
+                document.getElementById('pack-progress-bar').style.width = '100%';
+                setTimeout(() => {
+                    hideDialog('pack-progress-dialog');
+                    isPacked = true;
+                    updatePackButton();
+                    // Clear temp data for this template after packing
+                    clearTempData(currentTemplate ? currentTemplate.id : null);
+                    // Save to history with package name
+                    doPacking(packageName);
+                    // Create and share via native
+                    createAndShareNative(packageName);
+                }, 500);
+            } else {
+                document.getElementById('pack-progress-text').textContent = '正在压缩照片...';
+                document.getElementById('pack-progress-pct').textContent = Math.floor(progress) + '%';
+                document.getElementById('pack-progress-bar').style.width = progress + '%';
+            }
+        }, 200);
+    }
+
+    function createAndShareNative(packageName) {
+        const allTypes = [...presets, ...customTypes];
+        // Build file paths JSON: { "证件类型名": [filePath, ...], ... }
+        const photosObj = {};
+        Object.keys(docPhotos).forEach(typeId => {
+            if (docPhotos[typeId] && docPhotos[typeId].length > 0) {
+                const t = allTypes.find(x => x.id === typeId);
+                const name = t ? t.name : typeId;
+                photosObj[name] = docPhotos[typeId];
+            }
+        });
+        const photosJson = JSON.stringify(photosObj);
+        if (!callNative('createPackageFromFiles', packageName, photosJson, namingMode, packMode, timestampMode)) {
+            // Fallback: show share dialog for non-Android
+            showDialog('share-dialog');
+        }
+    }
+
+    // Native callback: package created (updated with historyId, typeCount, photoCount)
+    window.onPackageCreated = function(filePath, error, historyId, typeCount, photoCount) {
+        if (error) {
+            showToast('打包失败: ' + error, 'error');
+            return;
+        }
+        if (filePath) {
+            // Save file path to latest history record
+            if (historyRecords.length > 0) {
+                historyRecords[0].filePath = filePath;
+                localStorage.setItem('ck_history', JSON.stringify(historyRecords.map(r => { const { photos, ...rest } = r; return rest; })));
+            }
+        }
+    };
+
+    function doPacking(packageName) {
+        if (!currentTemplate) return;
+        const allTypes = [...presets, ...customTypes];
+        const typeCount = Object.keys(docPhotos).filter(k => docPhotos[k] && docPhotos[k].length > 0).length;
+        const photoCount = Object.values(docPhotos).reduce((sum, arr) => sum + (arr ? arr.length : 0), 0);
+        const now = new Date();
+        const dateStr = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0') + ' ' + String(now.getHours()).padStart(2,'0') + ':' + String(now.getMinutes()).padStart(2,'0');
+        // Build details list with photo data
+        const details = [];
+        const photos = {};
+        Object.keys(docPhotos).forEach(typeId => {
+            if (docPhotos[typeId] && docPhotos[typeId].length > 0) {
+                const t = allTypes.find(x => x.id === typeId);
+                const name = t ? t.name : typeId;
+                details.push({ name: name, count: docPhotos[typeId].length });
+                photos[name] = docPhotos[typeId];
+            }
+        });
+        const recordId = 'hist_' + Date.now();
+        historyRecords.unshift({
+            id: recordId,
+            templateName: currentTemplate.name,
+            packageName: packageName || currentTemplate.name,
+            typeCount: typeCount,
+            photoCount: photoCount,
+            date: dateStr,
+            details: details,
+            hasPhotos: true,
+            filePath: ''
+        });
+        // Keep only last 50 history records
+        if (historyRecords.length > 50) {
+            // Remove photos data for records being discarded
+            const removed = historyRecords.slice(50);
+            removed.forEach(r => {
+                if (r.id) {
+                    localStorage.removeItem('ck_hist_photos_' + r.id);
+                    // Also remove per-type keys
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('ck_hp_' + r.id + '_')) localStorage.removeItem(key);
+                    }
+                }
+            });
+            historyRecords = historyRecords.slice(0, 50);
+        }
+        // Save record index (without photos) to avoid quota issues
+        const indexRecords = historyRecords.map(r => { const { photos, ...rest } = r; return rest; });
+        try {
+            localStorage.setItem('ck_history', JSON.stringify(indexRecords));
+        } catch(e) {
+            // If even index fails, trim records
+            while (indexRecords.length > 1) {
+                const removed = indexRecords.pop();
+                if (removed.id) localStorage.removeItem('ck_hist_photos_' + removed.id);
+                try { localStorage.setItem('ck_history', JSON.stringify(indexRecords)); break; } catch(e2) { continue; }
+            }
+        }
+        // Save photos to external files via NativeBridge (no localStorage quota issues)
+        if (isAndroid && NativeBridge.copyPhotoForHistory) {
+            const photoPaths = {};
+            let copyOk = true;
+            Object.keys(photos).forEach(typeName => {
+                photoPaths[typeName] = [];
+                photos[typeName].forEach((photo, idx) => {
+                    if (isFilePath(photo)) {
+                        const newPath = NativeBridge.copyPhotoForHistory(photo, recordId, typeName, idx);
+                        if (newPath) {
+                            photoPaths[typeName].push(newPath);
+                        } else {
+                            copyOk = false;
+                        }
+                    } else {
+                        // Fallback for base64 photos (non-file)
+                        photoPaths[typeName].push(photo);
+                    }
+                });
+            });
+            // Save file paths to localStorage (much smaller than base64)
+            try {
+                localStorage.setItem('ck_hist_photos_' + recordId, JSON.stringify(photoPaths));
+            } catch(e) {
+                const rec = historyRecords.find(r => r.id === recordId);
+                if (rec) rec.hasPhotos = false;
+            }
+            if (!copyOk) {
+                const rec = historyRecords.find(r => r.id === recordId);
+                if (rec) rec.hasPhotos = false;
+            }
+        } else {
+            // Fallback: save as thumbnails for non-Android
+            createThumbnailsForHistory(photos).then(function(photosToSave) {
+                try {
+                    localStorage.setItem('ck_hist_photos_' + recordId, JSON.stringify(photosToSave));
+                } catch(e) {
+                    const rec = historyRecords.find(r => r.id === recordId);
+                    if (rec) rec.hasPhotos = false;
+                }
+            });
+        }
+        try { localStorage.setItem('ck_history', JSON.stringify(historyRecords.map(r => { const { photos, ...rest } = r; return rest; }))); } catch(e2) {}
+    }
+
+    function shareVia(method) {
+        hideDialog('share-dialog');
+        if (method === 'local') {
+            // Local save - just re-create and share
+            const packageName = historyRecords.length > 0 ? historyRecords[0].packageName : '收集材料';
+            createAndShareNative(packageName);
+            return;
+        }
+        // For other methods, use native share which already shows the share sheet
+        const packageName = historyRecords.length > 0 ? historyRecords[0].packageName : '收集材料';
+        createAndShareNative(packageName);
+    }
+
+    // ===== BACK HANDLERS =====
+    function handleCollectionBack() {
+        if (isPacked) {
+            // After packing, clear temp data for this template and go back
+            clearTempData(currentTemplate ? currentTemplate.id : null);
+            isPacked = false;
+            docPhotos = {};
+            currentTemplate = null;
+            switchTab('home');
+            return;
+        }
+        const hasAny = Object.values(docPhotos).some(arr => arr && arr.length > 0);
+        if (hasAny) {
+            showDialog('back-confirm-dialog');
+        } else {
+            // No photos, just clear any temp data and go back
+            clearTempData(currentTemplate ? currentTemplate.id : null);
+            currentTemplate = null;
+            switchTab('home');
+        }
+    }
+
+    function handleDocDetailBack() {
+        showScreen('tab-collection');
+        renderDocGrid();
+        updatePackButton();
+    }
+
+    function saveTempAndBack() {
+        saveTempData();
+        hideDialog('back-confirm-dialog');
+        currentTemplate = null;
+        switchTab('home');
+    }
+
+    function discardAndBack() {
+        clearTempData(currentTemplate ? currentTemplate.id : null);
+        docPhotos = {};
+        isPacked = false;
+        hideDialog('back-confirm-dialog');
+        currentTemplate = null;
+        switchTab('home');
+    }
+
+    // ===== TEMP DATA (save/discard/restore) - per template =====
+    function getTempKey(templateId) { return 'ck_temp_tpl_' + templateId; }
+
+    function saveTempData() {
+        if (!currentTemplate) return;
+        const data = { templateId: currentTemplate.id, docPhotos: docPhotos, isPacked: isPacked };
+        try {
+            localStorage.setItem(getTempKey(currentTemplate.id), JSON.stringify(data));
+        } catch(e) {
+            // Storage quota exceeded - try to clear oldest temp data
+            clearOldestTempData();
+            try {
+                localStorage.setItem(getTempKey(currentTemplate.id), JSON.stringify(data));
+            } catch(e2) {
+                showToast('存储空间不足，无法暂存数据', 'error');
+            }
+        }
+    }
+
+    function clearTempData(templateId) {
+        if (templateId) {
+            localStorage.removeItem(getTempKey(templateId));
+        } else if (currentTemplate) {
+            localStorage.removeItem(getTempKey(currentTemplate.id));
+        }
+    }
+
+    function loadTempData(templateId) {
+        try {
+            const key = templateId ? getTempKey(templateId) : null;
+            if (!key) return null;
+            const raw = localStorage.getItem(key);
+            return raw ? JSON.parse(raw) : null;
+        } catch(e) { return null; }
+    }
+
+    function clearOldestTempData() {
+        // Find and remove the oldest temp data entry
+        const tempKeys = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('ck_temp_tpl_')) {
+                tempKeys.push(key);
+            }
+        }
+        // Remove first (oldest) temp data
+        if (tempKeys.length > 0) {
+            localStorage.removeItem(tempKeys[0]);
+        }
+    }
+
+    function hasAnyTempData() {
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('ck_temp_tpl_')) return true;
+        }
+        return false;
+    }
+
+    function checkTempData(templateId) {
+        const temp = loadTempData(templateId);
+        if (!temp || !temp.templateId) return false;
+        const tpl = templates.find(t => t.id === temp.templateId);
+        if (!tpl) { clearTempData(templateId); return false; }
+        return true;
+    }
+
+    function restoreTempData(templateId) {
+        const temp = loadTempData(templateId);
+        if (!temp) { hideDialog('temp-data-dialog'); return; }
+        currentTemplate = templates.find(t => t.id === temp.templateId);
+        docPhotos = temp.docPhotos || {};
+        isPacked = temp.isPacked || false;
+        clearTempData(templateId);
+        hideDialog('temp-data-dialog');
+        if (currentTemplate) {
+            document.getElementById('collection-title').textContent = currentTemplate.name;
+            renderDocGrid();
+            updatePackButton();
+            showScreen('tab-collection');
+        }
+    }
+
+    function discardTempData(templateId) {
+        clearTempData(templateId);
+        hideDialog('temp-data-dialog');
+    }
+
+    // ===== CUSTOM TYPES (Settings) =====
+    function renderSettingsCustomTypes() {
+        const allTypes = [...presets, ...customTypes];
+        const hint = document.getElementById('type-count-hint');
+        if (hint) hint.textContent = '共 ' + allTypes.length + ' 种证件类型';
+    }
+
+    // ===== NAMING & PACK MODE SETTINGS =====
+    function setNamingMode(mode) {
+        namingMode = mode;
+        localStorage.setItem('ck_naming_mode', mode);
+        updateNamingUI();
+    }
+    function setPackMode(mode) {
+        packMode = mode;
+        localStorage.setItem('ck_pack_mode', mode);
+        updatePackModeUI();
+    }
+    function setTimestampMode(mode) {
+        timestampMode = mode;
+        localStorage.setItem('ck_timestamp_mode', mode);
+        updateTimestampUI();
+    }
+    function updateTimestampUI() {
+        const offBtn = document.getElementById('ts-off-btn');
+        const onBtn = document.getElementById('ts-on-btn');
+        const hint = document.getElementById('ts-hint');
+        if (timestampMode === 'on') {
+            onBtn.style.borderColor = 'var(--primary)'; onBtn.style.background = 'var(--primary-light)'; onBtn.style.color = 'var(--primary)';
+            offBtn.style.borderColor = 'var(--border)'; offBtn.style.background = 'var(--surface)'; offBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '压缩包名称带时间戳，如：证件收集_20260718_175825.zip';
+        } else {
+            offBtn.style.borderColor = 'var(--primary)'; offBtn.style.background = 'var(--primary-light)'; offBtn.style.color = 'var(--primary)';
+            onBtn.style.borderColor = 'var(--border)'; onBtn.style.background = 'var(--surface)'; onBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）';
+        }
+    }
+    function updateNamingUI() {
+        const typeBtn = document.getElementById('naming-type-btn');
+        const orderBtn = document.getElementById('naming-order-btn');
+        const hint = document.getElementById('naming-hint');
+        if (namingMode === 'type') {
+            typeBtn.style.borderColor = 'var(--primary)'; typeBtn.style.background = 'var(--primary-light)'; typeBtn.style.color = 'var(--primary)';
+            orderBtn.style.borderColor = 'var(--border)'; orderBtn.style.background = 'var(--surface)'; orderBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '照片按「证件类型名_序号」命名，如：身份证_01.jpg';
+        } else {
+            orderBtn.style.borderColor = 'var(--primary)'; orderBtn.style.background = 'var(--primary-light)'; orderBtn.style.color = 'var(--primary)';
+            typeBtn.style.borderColor = 'var(--border)'; typeBtn.style.background = 'var(--surface)'; typeBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '照片按拍摄顺序命名，如：01.jpg、02.jpg';
+        }
+    }
+    function updatePackModeUI() {
+        const folderBtn = document.getElementById('pack-folder-btn');
+        const flatBtn = document.getElementById('pack-flat-btn');
+        const hint = document.getElementById('pack-hint');
+        if (packMode === 'folder') {
+            folderBtn.style.borderColor = 'var(--primary)'; folderBtn.style.background = 'var(--primary-light)'; folderBtn.style.color = 'var(--primary)';
+            flatBtn.style.borderColor = 'var(--border)'; flatBtn.style.background = 'var(--surface)'; flatBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '照片按证件类型分别存入对应文件夹';
+        } else {
+            flatBtn.style.borderColor = 'var(--primary)'; flatBtn.style.background = 'var(--primary-light)'; flatBtn.style.color = 'var(--primary)';
+            folderBtn.style.borderColor = 'var(--border)'; folderBtn.style.background = 'var(--surface)'; folderBtn.style.color = 'var(--text-2)';
+            if (hint) hint.textContent = '所有照片放入以压缩包名命名的文件夹内';
+        }
+    }
+
+    // ===== THEME & DARK MODE =====
+    let currentColor = localStorage.getItem('ck_theme_color') || 'blue';
+    let darkModePref = localStorage.getItem('ck_dark_mode') || 'off'; // 'off', 'on', 'auto'
+
+    function setThemeColor(color) {
+        currentColor = color;
+        localStorage.setItem('ck_theme_color', color);
+        document.documentElement.setAttribute('data-color', color);
+        updateThemeColorUI();
+    }
+
+    function updateThemeColorUI() {
+        const items = document.querySelectorAll('.theme-color-item');
+        items.forEach(item => {
+            const c = item.getAttribute('data-color');
+            if (c === currentColor) {
+                item.style.borderColor = 'var(--primary)';
+                item.classList.add('selected');
+            } else {
+                item.style.borderColor = 'transparent';
+                item.classList.remove('selected');
+            }
+        });
+    }
+
+    function setDarkMode(mode) {
+        darkModePref = mode;
+        localStorage.setItem('ck_dark_mode', mode);
+        applyDarkMode();
+        updateDarkModeUI();
+    }
+
+    function applyDarkMode() {
+        let isDark = false;
+        if (darkModePref === 'on') {
+            isDark = true;
+        } else if (darkModePref === 'auto') {
+            // Priority: Native bridge > matchMedia (matchMedia unreliable on HyperOS)
+            if (isAndroid && NativeBridge.isSystemDarkMode) {
+                try { isDark = NativeBridge.isSystemDarkMode(); } catch(e) {
+                    isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                }
+            } else {
+                isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            }
+        }
+        if (isDark) {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.removeAttribute('data-theme');
+        }
+    }
+
+    // Called from native Android side to apply system dark mode (for HyperOS compatibility)
+    window.applySystemDarkMode = function(isDark) {
+        if (darkModePref === 'auto') {
+            if (isDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+        }
+    };
+
+    function updateDarkModeUI() {
+        const offBtn = document.getElementById('dark-off-btn');
+        const onBtn = document.getElementById('dark-on-btn');
+        const autoBtn = document.getElementById('dark-auto-btn');
+        const hint = document.getElementById('dark-hint');
+        // Reset all buttons
+        [offBtn, onBtn, autoBtn].forEach(btn => {
+            btn.style.borderColor = 'var(--border)';
+            btn.style.background = 'var(--surface)';
+            btn.style.color = 'var(--text-2)';
+        });
+        // Highlight active button
+        const activeBtn = darkModePref === 'off' ? offBtn : darkModePref === 'on' ? onBtn : autoBtn;
+        activeBtn.style.borderColor = 'var(--primary)';
+        activeBtn.style.background = 'var(--primary-light)';
+        activeBtn.style.color = 'var(--primary)';
+        // Update hint text
+        if (hint) {
+            if (darkModePref === 'off') hint.textContent = '使用浅色模式';
+            else if (darkModePref === 'on') hint.textContent = '使用深色模式';
+            else hint.textContent = '根据系统设置自动切换';
+        }
+    }
+
+    // Listen for system theme changes when in auto mode
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+            if (darkModePref === 'auto') applyDarkMode();
+        });
+    }
+    // Re-check dark mode when page becomes visible (APP returns to foreground)
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden && darkModePref === 'auto') {
+            applyDarkMode();
+        }
+    });
+
+    // ===== TYPE MANAGER PAGE =====
+    function renderTypeManager() {
+        const container = document.getElementById('type-manager-list');
+        const allTypes = [...presets, ...customTypes];
+        if (!allTypes.length) {
+            container.innerHTML = '<div class="empty-state"><i data-lucide="layers" style="width:48px;height:48px;"></i><p>暂无证件类型</p></div>';
+            lucide.createIcons();
+            return;
+        }
+        container.innerHTML = allTypes.map((t, idx) => {
+            const isPreset = idx < presets.length;
+            const usedByTemplates = templates.filter(tpl => tpl.types.includes(t.id));
+            const usedInfo = usedByTemplates.length > 0 ? '<span style="font-size:11px;color:var(--text-3);margin-top:2px;display:block;">被 ' + usedByTemplates.length + ' 个模板使用</span>' : '';
+            return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;' + (idx < allTypes.length - 1 ? 'border-bottom:1px solid var(--border);' : '') + '">' +
+                '<div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                    '<i data-lucide="' + (t.icon || 'file') + '" style="width:18px;height:18px;color:var(--primary);"></i>' +
+                '</div>' +
+                '<div style="flex:1;min-width:0;">' +
+                    '<div style="font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.name + '</div>' +
+                    usedInfo +
+                '</div>' +
+                '<button style="width:32px;height:32px;border-radius:8px;border:none;background:var(--surface-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="editType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="pencil" style="width:14px;height:14px;color:var(--text-2);"></i></button>' +
+                '<button style="width:32px;height:32px;border-radius:8px;border:none;background:var(--error-light);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="deleteType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="trash-2" style="width:14px;height:14px;color:var(--error);"></i></button>' +
+            '</div>';
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function handleTypeManagerBack() {
+        switchTab('settings');
+    }
+
+    function editType(id, isPreset) {
+        const allTypes = isPreset ? presets : customTypes;
+        const t = allTypes.find(x => x.id === id);
+        if (!t) return;
+        editingTypeId = id;
+        editingTypeIsPreset = isPreset;
+        document.getElementById('edit-type-name').value = t.name;
+        selectedIcon = t.icon || 'file';
+        renderEditTypeIconPicker();
+        document.getElementById('edit-type-dialog-title').textContent = '编辑证件类型';
+        showDialog('edit-type-dialog');
+    }
+
+    function renderEditTypeIconPicker() {
+        const container = document.getElementById('edit-type-icon-picker');
+        container.innerHTML = ICONS.map(icon => {
+            const sel = icon === selectedIcon;
+            return '<div class="icon-picker-item ' + (sel ? 'selected' : '') + '" onclick="selectedIcon=\'' + icon + '\';renderEditTypeIconPicker();">' +
+                '<i data-lucide="' + icon + '" style="width:20px;height:20px;color:' + (sel ? 'var(--primary)' : 'var(--text-2)') + ';"></i>' +
+            '</div>';
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function saveEditType() {
+        const name = document.getElementById('edit-type-name').value.trim();
+        if (!name) { showToast('请输入类型名称', 'warning'); return; }
+        // Check duplicate name (excluding current type)
+        const allTypes = [...presets, ...customTypes];
+        if (allTypes.some(t => t.name === name && t.id !== editingTypeId)) {
+            showToast('证件类型名称"' + name + '"已存在，请使用其他名称', 'warning');
+            return;
+        }
+        // Update the type
+        const arr = editingTypeIsPreset ? presets : customTypes;
+        const t = arr.find(x => x.id === editingTypeId);
+        if (t) {
+            t.name = name;
+            t.icon = selectedIcon;
+        }
+        // Save
+        if (editingTypeIsPreset) {
+            savePresets();
+        } else {
+            localStorage.setItem('ck_custom_types', JSON.stringify(customTypes));
+        }
+        renderTypeManager();
+        renderSettingsCustomTypes();
+        hideDialog('edit-type-dialog');
+    }
+
+    function deleteType(id, isPreset) {
+        deleteTypeId = id;
+        deleteTypeIsPreset = isPreset;
+        // Find templates using this type
+        const usedByTemplates = templates.filter(tpl => tpl.types.includes(id));
+        const typeName = [...presets, ...customTypes].find(t => t.id === id)?.name || id;
+        let msg = '确定要删除证件类型"' + typeName + '"吗？';
+        if (usedByTemplates.length > 0) {
+            msg = '以下模板正在使用"' + typeName + '"：';
+            const templateList = usedByTemplates.map(t => '· ' + t.name).join('\n');
+            document.getElementById('del-type-msg').textContent = msg;
+            document.getElementById('del-type-templates').style.display = 'block';
+            document.getElementById('del-type-templates').innerHTML = '<div style="background:var(--warning-light);padding:10px 12px;border-radius:8px;margin-top:4px;">' +
+                usedByTemplates.map(t => '<div style="font-size:13px;color:var(--text-1);padding:2px 0;">· ' + t.name + '（' + t.types.length + '种证件）</div>').join('') +
+                '<div style="font-size:12px;color:var(--error);margin-top:6px;font-weight:500;">删除后将从这些模板中移除该类型</div>' +
+            '</div>';
+        } else {
+            document.getElementById('del-type-msg').textContent = msg;
+            document.getElementById('del-type-templates').style.display = 'none';
+        }
+        showDialog('del-type-dialog');
+    }
+
+    function confirmDeleteType() {
+        // Remove from presets or customTypes
+        if (deleteTypeIsPreset) {
+            presets = presets.filter(t => t.id !== deleteTypeId);
+            savePresets();
+        } else {
+            customTypes = customTypes.filter(t => t.id !== deleteTypeId);
+            localStorage.setItem('ck_custom_types', JSON.stringify(customTypes));
+        }
+        // Remove from all templates that use this type
+        templates.forEach(tpl => {
+            const idx = tpl.types.indexOf(deleteTypeId);
+            if (idx >= 0) tpl.types.splice(idx, 1);
+        });
+        saveTemplates();
+        renderTypeManager();
+        renderSettingsCustomTypes();
+        hideDialog('del-type-dialog');
+    }
+
+    function showAddTypeDialog() {
+        document.getElementById('new-type-name').value = '';
+        selectedIcon = 'file';
+        renderTypeIconPicker();
+        showDialog('add-type-dialog');
+    }
+
+    function renderTypeIconPicker() {
+        const container = document.getElementById('type-icon-picker');
+        container.innerHTML = ICONS.map(icon => {
+            const sel = icon === selectedIcon;
+            return '<div class="icon-picker-item ' + (sel ? 'selected' : '') + '" onclick="selectedIcon=\'' + icon + '\';renderTypeIconPicker();">' +
+                '<i data-lucide="' + icon + '" style="width:20px;height:20px;color:' + (sel ? 'var(--primary)' : 'var(--text-2)') + ';"></i>' +
+            '</div>';
+        }).join('');
+        lucide.createIcons();
+    }
+
+    function addCustomType() {
+        const name = document.getElementById('new-type-name').value.trim();
+        if (!name) { showToast('请输入类型名称', 'warning'); return; }
+        // Check duplicate name against presets and existing custom types
+        const allTypes = [...presets, ...customTypes];
+        if (allTypes.some(t => t.name === name)) {
+            showToast('证件类型名称"' + name + '"已存在，请使用其他名称', 'warning');
+            return;
+        }
+        const id = 'custom_' + Date.now();
+        customTypes.push({ id, name, icon: selectedIcon });
+        localStorage.setItem('ck_custom_types', JSON.stringify(customTypes));
+        // Refresh the appropriate view
+        const activeScreen = document.querySelector('.screen.active');
+        if (activeScreen && activeScreen.id === 'tab-type-manager') {
+            renderTypeManager();
+        } else {
+            renderSettingsCustomTypes();
+        }
+        hideDialog('add-type-dialog');
+    }
+
+    // ===== INIT =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Restore compression quality setting and sync to native
+        const savedQuality = localStorage.getItem('ck_quality');
+        const qualityValue = savedQuality ? parseInt(savedQuality) : 70;
+        if (savedQuality) {
+            const slider = document.getElementById('quality-slider');
+            if (slider) { slider.value = savedQuality; document.getElementById('q-val').textContent = savedQuality + '%'; }
+        }
+        // Sync quality to native bridge for photo compression
+        if (typeof NativeBridge !== 'undefined' && NativeBridge.setCompressQuality) {
+            NativeBridge.setCompressQuality(qualityValue);
+        }
+        // Migrate old single temp data to per-template format
+        try {
+            const oldTemp = localStorage.getItem('ck_temp_data');
+            if (oldTemp) {
+                const data = JSON.parse(oldTemp);
+                if (data && data.templateId) {
+                    localStorage.setItem(getTempKey(data.templateId), oldTemp);
+                }
+                localStorage.removeItem('ck_temp_data');
+            }
+        } catch(e) {}
+        lucide.createIcons();
+        renderHomeList();
+        // Initialize naming & pack mode UI
+        updateNamingUI();
+        updatePackModeUI();
+        updateTimestampUI();
+        // Initialize theme color
+        if (currentColor && currentColor !== 'blue') {
+            document.documentElement.setAttribute('data-color', currentColor);
+        }
+        updateThemeColorUI();
+        // Initialize dark mode
+        applyDarkMode();
+        updateDarkModeUI();
+    });
+    </script>
+</body>
+</html>
