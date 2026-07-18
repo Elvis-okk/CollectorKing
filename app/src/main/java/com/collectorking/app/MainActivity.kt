@@ -154,6 +154,30 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    // NativeBridge: pick image launcher (for background customization)
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val uri = result.data?.data
+            if (uri != null) {
+                try {
+                    contentResolver.takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                } catch (_: Exception) { /* not all URIs support this */ }
+                Thread {
+                    val base64 = uriToBase64(uri)
+                    runOnUiThread {
+                        callJsFunction("window.onPickImageResult && window.onPickImageResult('$base64')")
+                    }
+                }.start()
+            } else {
+                callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
+            }
+        } else {
+            callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
+        }
+    }
+
     // NativeBridge: text file import launcher
     private var pendingImportCallback: String = ""
     private val textFileImportLauncher = registerForActivityResult(
@@ -304,6 +328,27 @@ class MainActivity : AppCompatActivity() {
         } catch (e: Exception) {
             Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
             callJsFunction("window.onAlbumMultiResult && window.onAlbumMultiResult('${escapeJs(docType)}', [])")
+        }
+    }
+
+    fun launchPickImage() {
+        if (!hasPermissions()) {
+            checkAndRequestPermissions()
+            return
+        }
+        val intent = Intent(Intent.ACTION_PICK).apply {
+            type = "image/*"
+        }
+        if (intent.resolveActivity(packageManager) != null) {
+            try {
+                pickImageLauncher.launch(intent)
+            } catch (e: Exception) {
+                Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
+                callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
+            }
+        } else {
+            Toast.makeText(this, "没有可用的相册应用", Toast.LENGTH_SHORT).show()
+            callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
         }
     }
 

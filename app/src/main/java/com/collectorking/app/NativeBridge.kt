@@ -97,6 +97,18 @@ class NativeBridge(private val activity: Activity) {
     }
 
     /**
+     * Open album to pick a single image for background customization.
+     * Called from JS: NativeBridge.pickImage()
+     * Result callback: window.onPickImageResult(base64Data)
+     */
+    @JavascriptInterface
+    fun pickImage() {
+        activity.runOnUiThread {
+            (activity as? MainActivity)?.launchPickImage()
+        }
+    }
+
+    /**
      * Share a file using Android's share sheet.
      */
     @JavascriptInterface
