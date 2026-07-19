@@ -6,9 +6,11 @@
     <title>收集王</title>
     <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/tailwindcss.js"></script>
     <script src="https://storage.360buyimg.com/dist-dev/joycoder/fe-page-cdn/lucide.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.1/dist/cropper.min.js"></script>
     <style>
         :root {
-            --primary: #4F8EFF; --primary-light: #EBF3FF; --primary-dark: #3A6FD8;
+            --primary: #4F8EFF; --primary-rgb: 79,142,255; --primary-light: #EBF3FF; --primary-dark: #3A6FD8;
             --success: #34A853; --success-light: #E6F4EA;
             --warning: #FBBC04; --warning-light: #FEF7E0;
             --error: #EA4335; --error-light: #FCE8E6;
@@ -17,19 +19,19 @@
             --border: #E8EAED;
         }
         /* Theme: Green */
-        [data-color="green"] { --primary: #10B981; --primary-light: #D1FAE5; --primary-dark: #059669; }
+        [data-color="green"] { --primary: #10B981; --primary-rgb: 16,185,129; --primary-light: #D1FAE5; --primary-dark: #059669; }
         /* Theme: Purple */
-        [data-color="purple"] { --primary: #8B5CF6; --primary-light: #EDE9FE; --primary-dark: #7C3AED; }
+        [data-color="purple"] { --primary: #8B5CF6; --primary-rgb: 139,92,246; --primary-light: #EDE9FE; --primary-dark: #7C3AED; }
         /* Theme: Orange */
-        [data-color="orange"] { --primary: #F97316; --primary-light: #FFF7ED; --primary-dark: #EA580C; }
+        [data-color="orange"] { --primary: #F97316; --primary-rgb: 249,115,22; --primary-light: #FFF7ED; --primary-dark: #EA580C; }
         /* Theme: Teal */
-        [data-color="teal"] { --primary: #06B6D4; --primary-light: #CFFAFE; --primary-dark: #0891B2; }
+        [data-color="teal"] { --primary: #06B6D4; --primary-rgb: 6,182,212; --primary-light: #CFFAFE; --primary-dark: #0891B2; }
         /* Theme: Pink */
-        [data-color="pink"] { --primary: #EC4899; --primary-light: #FCE7F3; --primary-dark: #DB2777; }
+        [data-color="pink"] { --primary: #FFB6C1; --primary-rgb: 255,182,193; --primary-light: #FCE7F3; --primary-dark: #DB2777; }
         /* Theme: Gray */
-        [data-color="gray"] { --primary: #6B7280; --primary-light: #F3F4F6; --primary-dark: #4B5563; }
+        [data-color="gray"] { --primary: #6B7280; --primary-rgb: 107,114,128; --primary-light: #F3F4F6; --primary-dark: #4B5563; }
         /* Theme: Mono */
-        [data-color="mono"] { --primary: #374151; --primary-light: #F9FAFB; --primary-dark: #1F2937; }
+        [data-color="mono"] { --primary: #374151; --primary-rgb: 55,65,81; --primary-light: #F9FAFB; --primary-dark: #1F2937; }
         /* Dark mode overrides */
         [data-theme="dark"] {
             --bg: #1A1A1A; --surface: #2D2D2D; --surface-dim: #242424;
@@ -56,11 +58,11 @@
         .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 0; cursor: pointer; transition: all 0.2s; position: relative; border: none; background: none; }
         .nav-item i { width: 50px; height: 50px; color: var(--text-3); transition: all 0.2s; }
         .nav-item.active i { color: var(--primary); }
-        .nav-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; background: var(--primary); border-radius: 0 0 2px 2px; }
+        .nav-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; background: rgba(var(--primary-rgb),0.8); border-radius: 0 0 2px 2px; }
         .card { background: var(--custom-surface-bg, var(--surface)); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); overflow: hidden; }
         .screen-header { background: var(--custom-surface-bg, var(--surface)); }
         .section-title { font-size: 17px; font-weight: 700; color: var(--text-1); padding: 0 20px; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
-        .btn-primary { background: var(--primary); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.15s; }
+        .btn-primary { background: rgba(var(--primary-rgb),0.8); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; transition: all 0.15s; }
         .btn-primary:hover { background: var(--primary-dark); }
         .btn-primary:disabled { background: var(--border); color: var(--text-3); cursor: not-allowed; }
         .btn-success { background: var(--success); color: white; border: none; padding: 14px 28px; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; width: 100%; }
@@ -79,13 +81,13 @@
         .dialog-handle { width: 32px; height: 4px; background: var(--border); border-radius: 2px; margin: 0 auto 16px; }
         .dialog h3 { font-size: 18px; font-weight: 700; color: var(--text-1); margin-bottom: 8px; }
         .dialog p { font-size: 14px; color: var(--text-2); line-height: 1.6; }
-        .toast-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 16px; pointer-events: none; }
-        .toast { background: rgba(50,50,50,0.92); color: #fff; padding: 14px 20px; border-radius: 14px; font-size: 14px; font-weight: 500; line-height: 1.5; box-shadow: 0 4px 20px rgba(0,0,0,0.25); max-width: 340px; width: 100%; animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; text-align: center; border-left: 4px solid var(--primary); }
-        .toast.success { background: rgba(46,125,50,0.92); border-left-color: #4CAF50; }
-        .toast.warning { background: rgba(230,81,0,0.92); border-left-color: #FF9800; }
-        .toast.error { background: rgba(198,40,40,0.92); border-left-color: #f44336; }
-        .toast.theme { background: var(--primary); border-left-color: var(--primary-dark); }
-        .toast.bottom { position: fixed; bottom: calc(36px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.95); color: #333; font-size: 12px; padding: 8px 16px; border-radius: 20px; border-left: none; max-width: 260px; animation: toastBottomIn 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .toast-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; padding: 0 16px calc(50px + env(safe-area-inset-bottom, 0px)); pointer-events: none; }
+        .toast { background: rgba(105,105,105,0.8); color: #222; padding: 14px 20px; border-radius: 14px; font-size: 14px; font-weight: 700; line-height: 1.5; box-shadow: 0 4px 20px rgba(0,0,0,0.25); max-width: 340px; width: 100%; animation: toastIn 0.3s cubic-bezier(0.16,1,0.3,1); pointer-events: auto; text-align: center; }
+        .toast.success { background: rgba(var(--primary-rgb),0.8); }
+        .toast.warning { background: rgba(238,232,170,0.8); }
+        .toast.error { background: rgba(255,69,0,0.8); }
+        .toast.theme { background: rgba(var(--primary-rgb),0.8); }
+        .toast.bottom { position: fixed; z-index: 200; bottom: calc(50px + env(safe-area-inset-bottom, 0px)); left: 50%; transform: translateX(-50%); background: rgba(var(--primary-rgb),0.8); color: #000; font-size: 12px; font-weight: 700; padding: 8px 16px; border-radius: 20px; border-left: none; max-width: 260px; animation: toastBottomIn 0.2s ease; box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
         .toast.bottom.out { animation: toastBottomOut 0.2s ease forwards; }
         .toast.out { animation: toastOut 0.25s ease forwards; }
         @keyframes toastIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
@@ -103,7 +105,7 @@
         .share-icon { width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center; }
         .share-label { font-size: 11px; color: var(--text-2); font-weight: 500; }
         .progress-bar { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width 0.3s ease; }
+        .progress-fill { height: 100%; background: rgba(var(--primary-rgb),0.8); border-radius: 3px; transition: width 0.3s ease; }
         .doc-btn:active { transform: scale(0.96); }
         .photo-frame { width: 100%; aspect-ratio: 4/3; border: 2px dashed var(--border); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; position: relative; overflow: hidden; background: var(--surface-dim); -webkit-user-select: none; user-select: none; }
         .photo-frame:active { transform: scale(0.97); border-color: var(--primary); background: var(--primary-light); }
@@ -125,14 +127,22 @@
         .icon-picker-item:hover { border-color: var(--primary); background: var(--primary-light); }
         .icon-picker-item.selected { border-color: var(--primary); background: var(--primary-light); box-shadow: 0 0 0 2px var(--primary-light); }
         .multi-album-btn { display: flex; align-items: center; justify-content: center; gap: 6px; background: var(--primary-light); color: var(--primary); border: 1.5px solid var(--primary); border-radius: 12px; padding: 12px; font-size: 14px; font-weight: 500; cursor: pointer; width: 100%; margin-top: 16px; transition: all 0.15s; }
-        .multi-album-btn:active { background: var(--primary); color: white; }
+        .type-sort-item { transition: transform 0.25s ease; }
+        .type-sort-item.anim-up { animation: sortSlideUp 0.25s ease; }
+        .type-sort-item.anim-down { animation: sortSlideDown 0.25s ease; }
+        .tpl-sort-card { transition: transform 0.25s ease; }
+        .cropper-view-box { outline: 2px dashed rgba(255,255,255,0.9) !important; outline-color: rgba(255,255,255,0.9) !important; }
+        .cropper-line, .cropper-point { display: none !important; }
+        #bg-crop-container .cropper-drag-box { background: rgba(0,0,0,0.4) !important; }
+        @keyframes sortSlideUp { from { transform: translateY(calc(100% + 4px)); opacity: 0.6; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes sortSlideDown { from { transform: translateY(calc(-100% - 4px)); opacity: 0.6; } to { transform: translateY(0); opacity: 1; } }
     </style>
 </head>
 <body>
     <div id="app">
         <!-- Background layer -->
         <div id="custom-bg-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;overflow:hidden;">
-            <img id="custom-bg-img" style="position:absolute;object-fit:cover;" src="" alt="">
+            <img id="custom-bg-img" style="position:absolute;" src="" alt="">
         </div>
 
         <!-- ===== TAB 1: HOME ===== -->
@@ -308,17 +318,21 @@
                             <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="history" style="width:14px;height:14px;color:var(--primary);"></i></div>
                             <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">历史记录</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">打包记录自动保存，可查看历史打包详情、继续编辑或重新分享。</div></div>
                         </div>
+                        <div style="display:flex;align-items:flex-start;gap:10px;margin-top:12px;">
+                            <div style="width:28px;height:28px;border-radius:8px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;"><i data-lucide="image" style="width:14px;height:14px;color:var(--primary);"></i></div>
+                            <div><div style="font-size:14px;font-weight:600;color:var(--text-1);">自定义背景</div><div style="font-size:12px;color:var(--text-2);margin-top:2px;line-height:1.5;">在外观设置中上传自定义背景图片，支持裁剪、透明度和模糊度调节。背景历史自动保存，可快速切换已使用的背景。</div></div>
+                        </div>
                     </div>
                 </div>
                 <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">关于</div>
                 <div class="card" style="margin-bottom:20px;">
                     <div style="padding:16px;display:flex;align-items:center;gap:12px;">
                         <div style="width:44px;height:44px;border-radius:12px;background:var(--primary);display:flex;align-items:center;justify-content:center;"><i data-lucide="shield-check" style="width:24px;height:24px;color:white;"></i></div>
-                        <div><div style="font-size:15px;font-weight:600;color:var(--text-1);cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="handleSecretTap()" id="app-name-text">收集王<span style="font-size:11px;font-weight:400;color:var(--text-3);">快速点击下载最新版本</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="app-version">版本 1.5.0</div></div>
+                        <div><div style="font-size:15px;font-weight:600;color:var(--text-1);cursor:pointer;user-select:none;display:flex;align-items:center;gap:8px;" onclick="handleSecretTap()" id="app-name-text">收集王<span style="font-size:11px;font-weight:400;color:var(--text-3);">快速点击下载最新版本</span></div><div style="font-size:12px;color:var(--text-3);margin-top:2px;" id="app-version">版本 1.5.1</div></div>
                     </div>
                     <div style="height:1px;background:var(--border);margin:0 16px;"></div>
                     <div style="padding:12px 16px 16px;">
-                        <p style="font-size:13px;color:var(--text-2);line-height:1.7;">收集王是一款证件材料收集助手，帮助您快速收集、整理和打包各类证件照片。支持自定义证件类型、模板管理、照片压缩、一键打包分享，让材料收集更高效便捷。</p>
+                        <p style="font-size:13px;color:var(--text-2);line-height:1.7;">收集王是一款证件材料收集助手，帮助您快速收集、整理和打包各类证件照片。支持自定义证件类型、模板管理、照片压缩、自定义背景、一键打包分享，让材料收集更高效便捷。</p>
                     </div>
                     <div style="height:1px;background:var(--border);margin:0 16px;"></div>
                     <div style="padding:12px 16px 16px;">
@@ -359,7 +373,8 @@
                             <i data-lucide="chevron-down" style="width:16px;height:16px;color:var(--text-3);transition:transform 0.2s;" id="changelog-arrow"></i>
                         </div>
                         <div style="font-size:12px;color:var(--text-2);line-height:1.8;margin-top:10px;">
-                            <div style="margin-bottom:6px;"><b style="color:var(--primary);">1.5.0</b> UI界面优化；新增清理数据数据显示及二次确认；新增使用统计；新增自定义背景（上传/裁切/透明度/模糊度）；新增软件更新入口</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--primary);">1.5.1</b> UI界面优化；优化主题显示；修复自定义背景预览框显示不正确的问题；新增自定义背景历史及缩略图</div>
+                            <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.5.0</b> UI界面优化；新增清理数据数据显示及二次确认；新增使用统计；新增自定义背景（上传/裁切/透明度/模糊度）；新增软件更新入口</div>
                         </div>
                         <div id="changelog-detail" style="display:none;font-size:12px;color:var(--text-2);line-height:1.8;margin-top:8px;padding-top:8px;border-top:1px solid var(--border);">
                             <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.4.1</b> 优化弹窗样式；新增清理缓存功能；历史记录上限50条；照片旋转缩略图适配</div>
@@ -459,7 +474,7 @@
                             <div class="theme-color-item" data-color="purple" onclick="setThemeColor('purple')" style="width:32px;height:32px;border-radius:50%;background:#8B5CF6;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
                             <div class="theme-color-item" data-color="orange" onclick="setThemeColor('orange')" style="width:32px;height:32px;border-radius:50%;background:#F97316;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
                             <div class="theme-color-item" data-color="teal" onclick="setThemeColor('teal')" style="width:32px;height:32px;border-radius:50%;background:#06B6D4;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="pink" onclick="setThemeColor('pink')" style="width:32px;height:32px;border-radius:50%;background:#EC4899;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="pink" onclick="setThemeColor('pink')" style="width:32px;height:32px;border-radius:50%;background:#FFB6C1;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
                             <div class="theme-color-item" data-color="gray" onclick="setThemeColor('gray')" style="width:32px;height:32px;border-radius:50%;background:#6B7280;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
                             <div class="theme-color-item" data-color="mono" onclick="setThemeColor('mono')" style="width:32px;height:32px;border-radius:50%;background:#374151;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
                         </div>
@@ -485,15 +500,15 @@
                         </div>
                         <div style="display:flex;gap:8px;margin-bottom:10px;">
                             <button id="bg-upload-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="uploadBackground()">上传图片</button>
-                            <button id="bg-remove-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="removeBackground()">移除背景</button>
+                            <button id="bg-remove-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="removeBackground()">取消背景</button>
                         </div>
                         <div id="bg-controls2" style="display:none;">
                             <div style="margin-bottom:8px;">
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
                                     <span style="font-size:12px;color:var(--text-2);">透明度</span>
-                                    <span style="font-size:12px;color:var(--primary);" id="bg-opacity-val2">20%</span>
+                                    <span style="font-size:12px;color:var(--primary);" id="bg-opacity-val2">25%</span>
                                 </div>
-                                <input type="range" id="bg-opacity-slider2" min="0" max="100" value="20" style="width:100%;accent-color:var(--primary);" oninput="updateBgOpacity(this.value)">
+                                <input type="range" id="bg-opacity-slider2" min="0" max="100" value="25" style="width:100%;accent-color:var(--primary);" oninput="updateBgOpacity(this.value)">
                             </div>
                             <div>
                                 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
@@ -503,6 +518,7 @@
                                 <input type="range" id="bg-blur-slider2" min="0" max="100" value="0" style="width:100%;accent-color:var(--primary);" oninput="updateBgBlur(this.value)">
                             </div>
                         </div>
+                        <div id="bg-history2" style="display:flex;gap:8px;overflow-x:auto;padding:10px 0 4px;-webkit-overflow-scrolling:touch;"></div>
                     </div>
                 </div>
             </div>
@@ -549,30 +565,32 @@
 
         <!-- ===== DIALOG: Edit Template ===== -->
         <div class="overlay" id="edit-template-dialog" onclick="if(event.target===this)hideDialog('edit-template-dialog')">
-            <div class="dialog">
+            <div class="dialog" style="max-height:85vh;display:flex;flex-direction:column;">
                 <div class="dialog-handle"></div>
                 <h3 id="edit-dialog-title">新建模板</h3>
-                <div style="margin-top:16px;">
-                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板名称</label>
-                    <input class="input-field" id="tpl-name-input" placeholder="如：证件收集" maxlength="20">
+                <div style="flex:1;overflow-y:auto;min-height:0;margin-top:12px;">
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板名称</label>
+                        <input class="input-field" id="tpl-name-input" placeholder="如：证件收集" maxlength="20">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板描述</label>
+                        <input class="input-field" id="tpl-desc-input" placeholder="如：常用证件材料收集" maxlength="40">
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择图标</label>
+                        <div class="icon-picker" id="tpl-icon-picker"></div>
+                    </div>
+                    <div style="margin-bottom:14px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">已选证件类型</label>
+                        <div id="tpl-type-selected" style="display:flex;flex-direction:column;gap:4px;min-height:32px;"></div>
+                    </div>
+                    <div style="margin-bottom:8px;">
+                        <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">添加证件类型</label>
+                        <div id="tpl-type-picker" style="display:flex;flex-wrap:wrap;gap:8px;max-height:120px;overflow-y:auto;padding:4px;"></div>
+                    </div>
                 </div>
-                <div style="margin-top:14px;">
-                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">模板描述</label>
-                    <input class="input-field" id="tpl-desc-input" placeholder="如：常用证件材料收集" maxlength="40">
-                </div>
-                <div style="margin-top:14px;">
-                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">选择图标</label>
-                    <div class="icon-picker" id="tpl-icon-picker"></div>
-                </div>
-                <div style="margin-top:14px;">
-                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">已选证件类型 <span style="font-weight:400;color:var(--text-3);font-size:11px;">长按拖拽排序</span></label>
-                    <div id="tpl-type-selected" style="display:flex;flex-wrap:wrap;gap:8px;min-height:32px;padding:4px;"></div>
-                </div>
-                <div style="margin-top:10px;">
-                    <label style="font-size:13px;font-weight:600;color:var(--text-2);display:block;margin-bottom:6px;">添加证件类型</label>
-                    <div id="tpl-type-picker" style="display:flex;flex-wrap:wrap;gap:8px;max-height:100px;overflow-y:auto;padding:4px;"></div>
-                </div>
-                <div class="dialog-actions">
+                <div class="dialog-actions" style="flex-shrink:0;">
                     <button class="btn-outlined" style="flex:1;" onclick="hideDialog('edit-template-dialog')">取消</button>
                     <button class="btn-primary" style="flex:1;" id="tpl-save-btn" onclick="saveTemplate()">保存</button>
                 </div>
@@ -810,13 +828,16 @@
         <div class="overlay center" id="bg-crop-dialog" onclick="if(event.target===this)cancelBgPosition()">
             <div class="dialog" style="max-width:360px;">
                 <h3>调整背景图片</h3>
-                <div style="position:relative;width:100%;margin:12px 0;overflow:hidden;border-radius:10px;background:#111;display:flex;align-items:center;justify-content:center;">
-                    <div id="bg-crop-container" style="position:relative;overflow:hidden;border-radius:10px;background:#000;touch-action:none;">
-                        <img id="bg-preview-img" style="display:block;user-select:none;-webkit-user-drag:none;" src="" alt="">
-                        <div id="bg-screen-rect" style="position:absolute;border:2px dashed rgba(255,255,255,0.8);pointer-events:none;box-sizing:border-box;background:rgba(0,0,0,0.3);"></div>
+                <div style="position:relative;width:100%;margin:12px 0;display:flex;align-items:center;justify-content:center;">
+                    <div id="bg-crop-container" style="position:relative;overflow:hidden;border-radius:10px;background:#000;touch-action:none;width:100%;">
+                        <img id="bg-preview-img" style="max-width:100%;display:block;" src="" alt="">
                     </div>
                 </div>
-                <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;">拖动定位 · 双指缩放旋转 · 虚线框为屏幕显示区域</div>
+                <div style="display:flex;gap:8px;margin-bottom:8px;justify-content:center;">
+                    <button style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-size:12px;cursor:pointer;" onclick="rotateBgPreview(-90)">↺ 左旋90°</button>
+                    <button style="padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text-2);font-size:12px;cursor:pointer;" onclick="rotateBgPreview(90)">↻ 右旋90°</button>
+                </div>
+                <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;">拖动定位 · 双指缩放 · 虚线框为屏幕显示区域</div>
                 <div class="dialog-actions">
                     <button class="btn-outlined" style="flex:1;" onclick="cancelBgPosition()">取消</button>
                     <button class="btn-primary" style="flex:1;" onclick="applyBgPosition()">应用</button>
@@ -856,6 +877,19 @@
         setTimeout(function() {
             toast.classList.add('out');
             setTimeout(function() { toast.remove(); }, 250);
+        }, duration);
+    }
+
+    function showBottomToast(msg, duration) {
+        duration = duration || 2000;
+        const container = document.getElementById('toast-container');
+        const toast = document.createElement('div');
+        toast.className = 'toast bottom';
+        toast.textContent = msg;
+        container.appendChild(toast);
+        setTimeout(function() {
+            toast.classList.add('out');
+            setTimeout(function() { toast.remove(); }, 200);
         }, duration);
     }
 
@@ -1640,7 +1674,7 @@
             return;
         }
         container.innerHTML = templates.map((t, idx) => `
-            <div class="card tpl-sort-card" style="margin-bottom:12px;transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;" data-tpl-id="${t.id}" data-tpl-idx="${idx}">
+            <div class="card tpl-sort-card" style="margin-bottom:12px;transition:transform 0.25s ease;" data-tpl-id="${t.id}" data-tpl-idx="${idx}">
                 <div style="display:flex;align-items:center;padding:12px 4px 12px 12px;">
                     <div style="width:44px;height:44px;border-radius:12px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
                         <i data-lucide="${t.icon}" style="width:22px;height:22px;color:${t.iconColor};"></i>
@@ -1650,149 +1684,65 @@
                         <div style="font-size:12px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.desc || ''}</div>
                         <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${t.types.length}种证件</div>
                     </div>
-                    <div style="padding:12px 8px;flex-shrink:0;touch-action:none;display:flex;align-items:center;" ontouchstart="onTplDragHandleTouch(event,'${t.id}')" ontouchend="onTplDragHandleTouchEnd(event)">
-                        <i data-lucide="grip-vertical" style="width:16px;height:16px;color:var(--text-3);opacity:0.35;"></i>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;flex-shrink:0;padding:0 4px;">
+                        <button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--primary);transition:all 0.15s;" onclick="event.stopPropagation();editTemplate('${t.id}')" ontouchstart="this.style.background='var(--primary-light)';this.style.borderColor='var(--primary)'" ontouchend="this.style.background='var(--surface)';this.style.borderColor='var(--border)'">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                        </button>
+                        <button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--error);transition:all 0.15s;" onclick="event.stopPropagation();deleteTemplate('${t.id}')" ontouchstart="this.style.background='var(--error-light)';this.style.borderColor='var(--error)'" ontouchend="this.style.background='var(--surface)';this.style.borderColor='var(--border)'">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                        </button>
+                        <button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-3);transition:all 0.15s;" onclick="event.stopPropagation();moveTplUp(${idx})" ontouchstart="this.style.background='var(--primary-light)';this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" ontouchend="this.style.background='var(--surface)';this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+                        </button>
+                        <button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:30px;height:30px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-3);transition:all 0.15s;" onclick="event.stopPropagation();moveTplDown(${idx})" ontouchstart="this.style.background='var(--primary-light)';this.style.borderColor='var(--primary)';this.style.color='var(--primary)'" ontouchend="this.style.background='var(--surface)';this.style.borderColor='var(--border)';this.style.color='var(--text-3)'">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
                     </div>
-                </div>
-                <div style="display:flex;border-top:1px solid var(--border);">
-                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--primary);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="event.stopPropagation();editTemplate('${t.id}')"><i data-lucide="pencil" style="width:14px;height:14px;"></i> 编辑</button>
-                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--success);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="event.stopPropagation();exportTemplate('${t.id}')"><i data-lucide="share-2" style="width:14px;height:14px;"></i> 分享</button>
-                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--error);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;" onclick="event.stopPropagation();deleteTemplate('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> 删除</button>
                 </div>
             </div>
         `).join('');
         lucide.createIcons();
     }
 
-    // Long-press & drag sort for template cards (via grip handle)
-    let tplDragging = false;
-    let tplDragIdx = -1;
-    let tplDragClone = null;
-    let tplDragStartY = 0;
-    let tplLongPressTimer = null;
-    let tplLongPressId = null;
-    let tplDragAbsY = 0;
-
-    function onTplDragHandleTouch(e, id) {
-        e.stopPropagation();
-        e.preventDefault();
-        tplLongPressId = id;
-        tplLongPressTimer = setTimeout(function() {
-            tplLongPressTimer = null;
-            startTplDrag(id, e.touches[0]);
-        }, 300);
-    }
-
-    function onTplDragHandleTouchEnd(e) {
-        if (tplLongPressTimer) {
-            clearTimeout(tplLongPressTimer);
-            tplLongPressTimer = null;
+    // Template sort: arrow buttons with animation
+    function moveTplUp(idx) {
+        if (idx <= 0) return;
+        var cards = document.querySelectorAll('#template-list .tpl-sort-card');
+        var cardA = cards[idx];
+        var cardB = cards[idx - 1];
+        if (cardA && cardB) {
+            var h = cardA.offsetHeight + 12;
+            cardA.style.transform = 'translateY(-' + h + 'px)';
+            cardB.style.transform = 'translateY(' + h + 'px)';
+            cardA.style.transition = 'transform 0.22s ease';
+            cardB.style.transition = 'transform 0.22s ease';
         }
+        setTimeout(function() {
+            var item = templates.splice(idx, 1)[0];
+            templates.splice(idx - 1, 0, item);
+            saveTemplates();
+            renderTemplateList();
+        }, 230);
     }
 
-    function startTplDrag(id, touch) {
-        const idx = templates.findIndex(t => t.id === id);
-        if (idx < 0) return;
-        tplDragging = true;
-        tplDragIdx = idx;
-        const cards = document.querySelectorAll('#template-list .tpl-sort-card');
-        const origCard = cards[idx];
-        if (!origCard) return;
-        const rect = origCard.getBoundingClientRect();
-        // Create floating clone
-        tplDragClone = origCard.cloneNode(true);
-        tplDragClone.style.position = 'fixed';
-        tplDragClone.style.left = rect.left + 'px';
-        tplDragClone.style.top = rect.top + 'px';
-        tplDragClone.style.width = rect.width + 'px';
-        tplDragClone.style.zIndex = '100';
-        tplDragClone.style.opacity = '0.9';
-        tplDragClone.style.transform = 'scale(1.03)';
-        tplDragClone.style.boxShadow = '0 8px 30px rgba(0,0,0,0.18)';
-        tplDragClone.style.pointerEvents = 'none';
-        tplDragClone.style.transition = 'none';
-        document.body.appendChild(tplDragClone);
-        // Dim original
-        origCard.style.opacity = '0.25';
-        tplDragStartY = touch.clientY;
-        tplDragAbsY = rect.top;
-        if (navigator.vibrate) navigator.vibrate(25);
-        showToast('上下拖动排序', 'bottom');
-        document.addEventListener('touchmove', onTplDragMove, { passive: false });
-        document.addEventListener('touchend', onTplDragEnd);
-        document.addEventListener('touchcancel', onTplDragEnd);
-    }
-
-    function onTplDragMove(e) {
-        if (!tplDragging || !tplDragClone) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        const dy = touch.clientY - tplDragStartY;
-        tplDragAbsY += dy;
-        tplDragClone.style.top = tplDragAbsY + 'px';
-        tplDragStartY = touch.clientY;
-        // Check swap
-        const cards = Array.from(document.querySelectorAll('#template-list .tpl-sort-card'));
-        const cloneH = tplDragClone.offsetHeight || 80;
-        const cloneCenterY = tplDragAbsY + cloneH / 2;
-        for (let i = 0; i < cards.length; i++) {
-            if (i === tplDragIdx) continue;
-            const cardRect = cards[i].getBoundingClientRect();
-            const cardMid = cardRect.top + cardRect.height / 2;
-            if (cloneCenterY < cardMid && i < tplDragIdx) {
-                const item = templates.splice(tplDragIdx, 1)[0];
-                templates.splice(i, 0, item);
-                tplDragIdx = i;
-                saveTemplates();
-                renderTemplateList();
-                const newCards = document.querySelectorAll('#template-list .tpl-sort-card');
-                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.25';
-                break;
-            } else if (cloneCenterY > cardMid && i > tplDragIdx) {
-                const item = templates.splice(tplDragIdx, 1)[0];
-                templates.splice(i, 0, item);
-                tplDragIdx = i;
-                saveTemplates();
-                renderTemplateList();
-                const newCards = document.querySelectorAll('#template-list .tpl-sort-card');
-                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.25';
-                break;
-            }
+    function moveTplDown(idx) {
+        if (idx >= templates.length - 1) return;
+        var cards = document.querySelectorAll('#template-list .tpl-sort-card');
+        var cardA = cards[idx];
+        var cardB = cards[idx + 1];
+        if (cardA && cardB) {
+            var h = cardA.offsetHeight + 12;
+            cardA.style.transform = 'translateY(' + h + 'px)';
+            cardB.style.transform = 'translateY(-' + h + 'px)';
+            cardA.style.transition = 'transform 0.22s ease';
+            cardB.style.transition = 'transform 0.22s ease';
         }
-    }
-
-    function onTplDragEnd(e) {
-        if (!tplDragging) return;
-        tplDragging = false;
-        // Animate clone back to target position
-        if (tplDragClone) {
-            const targetCard = document.querySelectorAll('#template-list .tpl-sort-card')[tplDragIdx];
-            if (targetCard) {
-                const targetRect = targetCard.getBoundingClientRect();
-                tplDragClone.style.transition = 'top 0.25s ease, left 0.25s ease, transform 0.25s ease, opacity 0.25s ease';
-                tplDragClone.style.top = targetRect.top + 'px';
-                tplDragClone.style.left = targetRect.left + 'px';
-                tplDragClone.style.transform = 'scale(1)';
-                tplDragClone.style.opacity = '0';
-                const clone = tplDragClone;
-                setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 300);
-            } else {
-                tplDragClone.style.transition = 'transform 0.2s, opacity 0.2s';
-                tplDragClone.style.transform = 'scale(1)';
-                tplDragClone.style.opacity = '0';
-                const clone = tplDragClone;
-                setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 250);
-            }
-            tplDragClone = null;
-        }
-        tplDragIdx = -1;
-        tplDragAbsY = 0;
-        document.querySelectorAll('#template-list .tpl-sort-card').forEach(function(c) { c.style.opacity = ''; });
-        document.removeEventListener('touchmove', onTplDragMove);
-        document.removeEventListener('touchend', onTplDragEnd);
-        document.removeEventListener('touchcancel', onTplDragEnd);
-        renderHomeList();
-        saveTemplates();
+        setTimeout(function() {
+            var item = templates.splice(idx, 1)[0];
+            templates.splice(idx + 1, 0, item);
+            saveTemplates();
+            renderTemplateList();
+        }, 230);
     }
 
     function showNewTemplateDialog() {
@@ -1873,7 +1823,17 @@
                 selContainer.innerHTML = selectedTypes.map((id, idx) => {
                     const t = allTypes.find(x => x.id === id);
                     if (!t) return '';
-                    return `<div class="type-sort-item" data-type-idx="${idx}" style="display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;border:1.5px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:500;cursor:grab;touch-action:none;" ontouchstart="onTypeSortTouchStart(event,${idx})" ontouchend="onTypeSortTouchEnd(event)"><i data-lucide="grip-vertical" style="width:14px;height:14px;opacity:0.5;"></i>${t.name}<span style="margin-left:2px;cursor:pointer;opacity:0.6;" onclick="event.stopPropagation();toggleType('${id}')">✕</span></div>`;
+                    return '<div class="type-sort-item" data-type-idx="' + idx + '" style="display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;border:1px solid var(--border);background:var(--surface);font-size:13px;font-weight:500;">' +
+                        '<span style="flex:1;color:var(--primary);">' + t.name + '</span>' +
+                        '<div style="display:flex;flex-direction:row;gap:4px;flex-shrink:0;align-items:center;">' +
+                        '<button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-3);font-size:12px;transition:all 0.15s;" onclick="event.stopPropagation();moveTypeUp(' + idx + ')" ontouchstart="this.style.background=\'var(--primary-light)\';this.style.borderColor=\'var(--primary)\';this.style.color=\'var(--primary)\'" ontouchend="this.style.background=\'var(--surface)\';this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text-3)\'">' +
+                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg></button>' +
+                        '<button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-3);font-size:12px;transition:all 0.15s;" onclick="event.stopPropagation();moveTypeDown(' + idx + ')" ontouchstart="this.style.background=\'var(--primary-light)\';this.style.borderColor=\'var(--primary)\';this.style.color=\'var(--primary)\'" ontouchend="this.style.background=\'var(--surface)\';this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text-3)\'">' +
+                        '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg></button>' +
+                        '</div>' +
+                        '<button style="border:1px solid var(--border);background:var(--surface);padding:0;cursor:pointer;width:28px;height:28px;display:flex;align-items:center;justify-content:center;border-radius:50%;color:var(--text-3);transition:all 0.15s;" onclick="event.stopPropagation();toggleType(\'' + id + '\')" ontouchstart="this.style.background=\'var(--error-light)\';this.style.borderColor=\'var(--error)\';this.style.color=\'var(--error)\'" ontouchend="this.style.background=\'var(--surface)\';this.style.borderColor=\'var(--border)\';this.style.color=\'var(--text-3)\'">' +
+                        '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></button>' +
+                        '</div>';
                 }).join('');
             }
         }
@@ -1882,128 +1842,50 @@
         if (container) {
             const unselected = allTypes.filter(t => !selectedTypes.includes(t.id));
             container.innerHTML = unselected.map(t => {
-                return `<button style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:500;cursor:pointer;" onclick="toggleType('${t.id}')">${t.name}</button>`;
+                return '<button style="padding:6px 12px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:500;cursor:pointer;" onclick="toggleType(\'' + t.id + '\')">' + t.name + '</button>';
             }).join('');
         }
         lucide.createIcons();
     }
 
-    // Type sort drag (full 2D)
-    let typeSortDragging = false;
-    let typeSortIdx = -1;
-    let typeSortClone = null;
-    let typeSortStartX = 0;
-    let typeSortStartY = 0;
-    let typeSortLongPress = null;
-    let typeSortAbsX = 0;
-    let typeSortAbsY = 0;
 
-    function onTypeSortTouchStart(e, idx) {
-        e.preventDefault();
-        typeSortLongPress = setTimeout(function() {
-            typeSortLongPress = null;
-            startTypeSortDrag(idx, e.touches[0]);
-        }, 300);
-    }
-
-    function onTypeSortTouchEnd(e) {
-        if (typeSortLongPress) {
-            clearTimeout(typeSortLongPress);
-            typeSortLongPress = null;
+    // Type sort: arrow buttons with animation
+    function moveTypeUp(idx) {
+        if (idx <= 0) return;
+        var items = document.querySelectorAll('.type-sort-item');
+        var itemA = items[idx];
+        var itemB = items[idx - 1];
+        if (itemA && itemB) {
+            var h = itemA.offsetHeight + 4;
+            itemA.style.transform = 'translateY(-' + h + 'px)';
+            itemB.style.transform = 'translateY(' + h + 'px)';
+            itemA.style.transition = 'transform 0.22s ease';
+            itemB.style.transition = 'transform 0.22s ease';
         }
+        setTimeout(function() {
+            var item = selectedTypes.splice(idx, 1)[0];
+            selectedTypes.splice(idx - 1, 0, item);
+            renderTypePicker();
+        }, 230);
     }
 
-    function startTypeSortDrag(idx, touch) {
-        typeSortDragging = true;
-        typeSortIdx = idx;
-        const items = document.querySelectorAll('#tpl-type-selected .type-sort-item');
-        const origItem = items[idx];
-        if (!origItem) return;
-        const rect = origItem.getBoundingClientRect();
-        typeSortClone = origItem.cloneNode(true);
-        typeSortClone.style.position = 'fixed';
-        typeSortClone.style.left = rect.left + 'px';
-        typeSortClone.style.top = rect.top + 'px';
-        typeSortClone.style.zIndex = '100';
-        typeSortClone.style.opacity = '0.9';
-        typeSortClone.style.transform = 'scale(1.08)';
-        typeSortClone.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
-        typeSortClone.style.pointerEvents = 'none';
-        typeSortClone.style.transition = 'none';
-        document.body.appendChild(typeSortClone);
-        origItem.style.opacity = '0.25';
-        typeSortStartX = touch.clientX;
-        typeSortStartY = touch.clientY;
-        typeSortAbsX = rect.left;
-        typeSortAbsY = rect.top;
-        if (navigator.vibrate) navigator.vibrate(20);
-        document.addEventListener('touchmove', onTypeSortMove, { passive: false });
-        document.addEventListener('touchend', onTypeSortEnd);
-        document.addEventListener('touchcancel', onTypeSortEnd);
-    }
-
-    function onTypeSortMove(e) {
-        if (!typeSortDragging || !typeSortClone) return;
-        e.preventDefault();
-        const touch = e.touches[0];
-        const dx = touch.clientX - typeSortStartX;
-        const dy = touch.clientY - typeSortStartY;
-        typeSortAbsX += dx;
-        typeSortAbsY += dy;
-        typeSortClone.style.left = typeSortAbsX + 'px';
-        typeSortClone.style.top = typeSortAbsY + 'px';
-        typeSortStartX = touch.clientX;
-        typeSortStartY = touch.clientY;
-        // Check swap by overlap
-        const items = Array.from(document.querySelectorAll('#tpl-type-selected .type-sort-item'));
-        const cloneW = typeSortClone.offsetWidth || 80;
-        const cloneH = typeSortClone.offsetHeight || 30;
-        const cloneCX = typeSortAbsX + cloneW / 2;
-        const cloneCY = typeSortAbsY + cloneH / 2;
-        for (let i = 0; i < items.length; i++) {
-            if (i === typeSortIdx) continue;
-            const r = items[i].getBoundingClientRect();
-            if (cloneCX > r.left && cloneCX < r.right && cloneCY > r.top && cloneCY < r.bottom) {
-                const item = selectedTypes.splice(typeSortIdx, 1)[0];
-                selectedTypes.splice(i, 0, item);
-                typeSortIdx = i;
-                renderTypePicker();
-                const newItems = document.querySelectorAll('#tpl-type-selected .type-sort-item');
-                if (newItems[typeSortIdx]) newItems[typeSortIdx].style.opacity = '0.25';
-                break;
-            }
+    function moveTypeDown(idx) {
+        if (idx >= selectedTypes.length - 1) return;
+        var items = document.querySelectorAll('.type-sort-item');
+        var itemA = items[idx];
+        var itemB = items[idx + 1];
+        if (itemA && itemB) {
+            var h = itemA.offsetHeight + 4;
+            itemA.style.transform = 'translateY(' + h + 'px)';
+            itemB.style.transform = 'translateY(-' + h + 'px)';
+            itemA.style.transition = 'transform 0.22s ease';
+            itemB.style.transition = 'transform 0.22s ease';
         }
-    }
-
-    function onTypeSortEnd(e) {
-        if (!typeSortDragging) return;
-        typeSortDragging = false;
-        if (typeSortClone) {
-            // Animate to target position
-            const targetItem = document.querySelectorAll('#tpl-type-selected .type-sort-item')[typeSortIdx];
-            if (targetItem) {
-                const targetRect = targetItem.getBoundingClientRect();
-                typeSortClone.style.transition = 'top 0.2s ease, left 0.2s ease, transform 0.2s ease, opacity 0.2s ease';
-                typeSortClone.style.left = targetRect.left + 'px';
-                typeSortClone.style.top = targetRect.top + 'px';
-                typeSortClone.style.transform = 'scale(1)';
-                typeSortClone.style.opacity = '0';
-            } else {
-                typeSortClone.style.transition = 'transform 0.2s, opacity 0.2s';
-                typeSortClone.style.transform = 'scale(1)';
-                typeSortClone.style.opacity = '0';
-            }
-            const clone = typeSortClone;
-            setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 250);
-            typeSortClone = null;
-        }
-        typeSortIdx = -1;
-        typeSortAbsX = 0;
-        typeSortAbsY = 0;
-        document.querySelectorAll('#tpl-type-selected .type-sort-item').forEach(function(el) { el.style.opacity = ''; });
-        document.removeEventListener('touchmove', onTypeSortMove);
-        document.removeEventListener('touchend', onTypeSortEnd);
-        document.removeEventListener('touchcancel', onTypeSortEnd);
+        setTimeout(function() {
+            var item = selectedTypes.splice(idx, 1)[0];
+            selectedTypes.splice(idx + 1, 0, item);
+            renderTypePicker();
+        }, 230);
     }
 
     function toggleType(id) {
@@ -3101,16 +2983,16 @@
             const isPreset = idx < presets.length;
             const usedByTemplates = templates.filter(tpl => tpl.types.includes(t.id));
             const usedInfo = usedByTemplates.length > 0 ? '<span style="font-size:11px;color:var(--text-3);margin-top:2px;display:block;">被 ' + usedByTemplates.length + ' 个模板使用</span>' : '';
-            return '<div style="display:flex;align-items:center;gap:12px;padding:12px 16px;' + (idx < allTypes.length - 1 ? 'border-bottom:1px solid var(--border);' : '') + '">' +
-                '<div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
-                    '<i data-lucide="' + (t.icon || 'file') + '" style="width:18px;height:18px;color:var(--primary);"></i>' +
+            return '<div style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:var(--surface);border-radius:14px;border:1px solid var(--border);margin-bottom:10px;box-shadow:0 1px 4px rgba(0,0,0,0.06);transition:transform 0.15s,box-shadow 0.15s;" onmousedown="this.style.transform=\'scale(0.97)\'" onmouseup="this.style.transform=\'\'" onmouseleave="this.style.transform=\'\'">' +
+                '<div style="width:40px;height:40px;border-radius:12px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                    '<i data-lucide="' + (t.icon || 'file') + '" style="width:20px;height:20px;color:var(--primary);"></i>' +
                 '</div>' +
                 '<div style="flex:1;min-width:0;">' +
                     '<div style="font-size:14px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + t.name + '</div>' +
                     usedInfo +
                 '</div>' +
-                '<button style="width:32px;height:32px;border-radius:8px;border:none;background:var(--surface-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="editType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="pencil" style="width:14px;height:14px;color:var(--text-2);"></i></button>' +
-                '<button style="width:32px;height:32px;border-radius:8px;border:none;background:var(--error-light);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="deleteType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="trash-2" style="width:14px;height:14px;color:var(--error);"></i></button>' +
+                '<button style="width:34px;height:34px;border-radius:10px;border:none;background:var(--surface-dim);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="editType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="pencil" style="width:14px;height:14px;color:var(--text-2);"></i></button>' +
+                '<button style="width:34px;height:34px;border-radius:10px;border:none;background:var(--error-light);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;" onclick="deleteType(\'' + t.id + '\',' + isPreset + ')"><i data-lucide="trash-2" style="width:14px;height:14px;color:var(--error);"></i></button>' +
             '</div>';
         }).join('');
         lucide.createIcons();
@@ -3255,25 +3137,227 @@
     }
 
     // ===== CUSTOM BACKGROUND =====
-    let bgImageData = localStorage.getItem('ck_bg_image') || '';
-    let bgOpacity = parseInt(localStorage.getItem('ck_bg_opacity') || '20');
+    // bgFilePath: path to image file in external storage (persisted in localStorage)
+    // bgImageData: base64 data URL loaded from file (in memory only, NOT persisted)
+    let bgFilePath = localStorage.getItem('ck_bg_file_path') || '';
+    let bgImageData = ''; // loaded from file on startup
+    let bgOpacity = parseInt(localStorage.getItem('ck_bg_opacity') || '25');
     let bgBlur = parseInt(localStorage.getItem('ck_bg_blur') || '0');
-    // Transform state: position offset (px from center), scale, rotation
-    let bgOffX = parseFloat(localStorage.getItem('ck_bg_off_x') || '0');
-    let bgOffY = parseFloat(localStorage.getItem('ck_bg_off_y') || '0');
-    let bgScale = parseFloat(localStorage.getItem('ck_bg_scale') || '1');
+    let bgIsCropped = localStorage.getItem('ck_bg_is_cropped') === '1';
+    // Old CropperJS-based parameters (kept for backward compatibility with old saved backgrounds)
+    let bgCenterX = parseFloat(localStorage.getItem('ck_bg_center_x') || '0');
+    let bgCenterY = parseFloat(localStorage.getItem('ck_bg_center_y') || '0');
+    let bgCropW = parseFloat(localStorage.getItem('ck_bg_crop_w') || '0');
+    let bgCropH = parseFloat(localStorage.getItem('ck_bg_crop_h') || '0');
     let bgRotation = parseFloat(localStorage.getItem('ck_bg_rotation') || '0');
     let bgNaturalW = parseInt(localStorage.getItem('ck_bg_natural_w') || '0');
     let bgNaturalH = parseInt(localStorage.getItem('ck_bg_natural_h') || '0');
-    // Preview dialog state
-    let bgPreviewNaturalW = 0;
-    let bgPreviewNaturalH = 0;
-    let bgPreviewOffX = 0;
-    let bgPreviewOffY = 0;
-    let bgPreviewScale = 1;
-    let bgPreviewRotation = 0;
-    let bgPreviewContainerW = 0;
-    let bgPreviewContainerH = 0;
+    let bgCropper = null;
+
+    // Load background image from file on startup
+    (function() {
+        // Clean up very old format keys
+        var oldKeys = ['ck_bg_off_x', 'ck_bg_off_y', 'ck_bg_scale', 'ck_bg_img_w', 'ck_bg_img_h', 'ck_bg_screen_w', 'ck_bg_screen_h'];
+        oldKeys.forEach(function(k) { localStorage.removeItem(k); });
+
+        // Migrate old localStorage base64 to file storage
+        var oldBase64 = localStorage.getItem('ck_bg_image') || '';
+        if (oldBase64 && !bgFilePath && isAndroid && NativeBridge.saveBgImage) {
+            try {
+                var rawBase64 = oldBase64.substring(oldBase64.indexOf(',') + 1);
+                var fileName = 'bg_migrate_' + Date.now() + '.jpg';
+                var path = NativeBridge.saveBgImage(rawBase64, fileName);
+                if (path) {
+                    bgFilePath = path;
+                    bgImageData = oldBase64;
+                    localStorage.setItem('ck_bg_file_path', path);
+                    localStorage.removeItem('ck_bg_image');
+                }
+            } catch(e) {}
+        }
+
+        // Load image from file path
+        if (bgFilePath && isAndroid && NativeBridge.readPhotoAsBase64) {
+            try {
+                var raw = NativeBridge.readPhotoAsBase64(bgFilePath);
+                if (raw) {
+                    bgImageData = 'data:image/jpeg;base64,' + raw;
+                }
+            } catch(e) {}
+        } else if (oldBase64) {
+            // Fallback: use old base64 from localStorage (backward compatibility)
+            bgImageData = oldBase64;
+        }
+
+        // If no valid data, clear everything
+        if (!bgImageData && !bgFilePath) {
+            bgIsCropped = false;
+            bgCenterX = 0; bgCenterY = 0;
+            bgCropW = 0; bgCropH = 0;
+            bgRotation = 0;
+            bgNaturalW = 0; bgNaturalH = 0;
+        }
+    })();
+
+    // Background history: array of {id, filePath, opacity, blur, isCropped}
+    // filePath: external storage path, display by reading original file directly
+    let bgHistory = [];
+    try { bgHistory = JSON.parse(localStorage.getItem('ck_bg_history') || '[]'); } catch(e) { bgHistory = []; }
+
+    function saveBgHistory() {
+        try {
+            localStorage.setItem('ck_bg_history', JSON.stringify(bgHistory));
+        } catch(e) {
+            // Keep removing oldest entries until save succeeds
+            while (bgHistory.length > 0) {
+                // Also delete the external file for removed entries
+                var removed = bgHistory.shift();
+                if (removed.filePath && isAndroid && NativeBridge.deleteBgImage) {
+                    try { NativeBridge.deleteBgImage(removed.filePath); } catch(e2) {}
+                }
+                try {
+                    localStorage.setItem('ck_bg_history', JSON.stringify(bgHistory));
+                    break;
+                } catch(e2) {
+                    continue;
+                }
+            }
+        }
+    }
+
+    function addBgToHistory(filePath, opacity, blur, isCropped) {
+        var existIdx = bgHistory.findIndex(function(h) { return h.filePath && filePath && h.filePath === filePath; });
+        if (existIdx >= 0) {
+            bgHistory[existIdx].opacity = opacity;
+            bgHistory[existIdx].blur = blur;
+            bgHistory[existIdx].isCropped = isCropped || false;
+        } else {
+            bgHistory.push({
+                id: 'bg_' + Date.now(),
+                filePath: filePath || '',
+                opacity: opacity, blur: blur,
+                isCropped: isCropped || false
+            });
+            if (bgHistory.length > 8) {
+                // Delete file for removed entry
+                var removed = bgHistory.shift();
+                if (removed.filePath && isAndroid && NativeBridge.deleteBgImage) {
+                    try { NativeBridge.deleteBgImage(removed.filePath); } catch(e) {}
+                }
+            }
+        }
+        saveBgHistory();
+    }
+
+    function switchBgHistory(id) {
+        var h = bgHistory.find(function(x) { return x.id === id; });
+        if (!h) return;
+        bgFilePath = h.filePath || '';
+        bgIsCropped = h.isCropped || false;
+        bgOpacity = h.opacity; bgBlur = h.blur;
+        // Load image from file
+        if (bgFilePath && isAndroid && NativeBridge.readPhotoAsBase64) {
+            try {
+                var raw = NativeBridge.readPhotoAsBase64(bgFilePath);
+                if (raw) bgImageData = 'data:image/jpeg;base64,' + raw;
+            } catch(e) {}
+        }
+        localStorage.setItem('ck_bg_file_path', bgFilePath);
+        if (bgIsCropped) {
+            localStorage.setItem('ck_bg_is_cropped', '1');
+        }
+        localStorage.setItem('ck_bg_opacity', String(bgOpacity));
+        localStorage.setItem('ck_bg_blur', String(bgBlur));
+        localStorage.removeItem('ck_bg_image'); // no longer store base64
+        applyCustomBackground();
+        updateBgUI();
+        renderBgHistory();
+        showToast('背景已切换', 'success');
+    }
+
+    function deleteBgHistory(id) {
+        var h = bgHistory.find(function(x) { return x.id === id; });
+        if (h && h.filePath && isAndroid && NativeBridge.deleteBgImage) {
+            try { NativeBridge.deleteBgImage(h.filePath); } catch(e) {}
+        }
+        bgHistory = bgHistory.filter(function(x) { return x.id !== id; });
+        saveBgHistory();
+        renderBgHistory();
+    }
+
+    function renderBgHistory() {
+        // Calculate thumbnail button size based on screen ratio (1/5 of screen)
+        var screenW = document.documentElement.clientWidth || 360;
+        var screenH = document.documentElement.clientHeight || 640;
+        var thumbW = Math.round(screenW / 5);
+        var thumbH = Math.round(screenH / 5);
+        ['','2'].forEach(function(suffix) {
+            var container = document.getElementById('bg-history' + suffix);
+            if (!container) return;
+            if (!bgHistory.length) {
+                container.innerHTML = '<div style="font-size:11px;color:var(--text-3);text-align:center;padding:8px 0;">暂无历史背景</div>';
+                return;
+            }
+            container.innerHTML = bgHistory.map(function(h) {
+                var isActive = bgFilePath && h.filePath === bgFilePath;
+                // Read original file for display (clearer than thumbnail)
+                var thumbSrc = '';
+                if (h.filePath && isAndroid && NativeBridge.readPhotoAsBase64) {
+                    try {
+                        var raw = NativeBridge.readPhotoAsBase64(h.filePath);
+                        if (raw) thumbSrc = 'data:image/jpeg;base64,' + raw;
+                    } catch(e) {}
+                }
+                return '<div style="position:relative;width:' + thumbW + 'px;height:' + thumbH + 'px;border-radius:10px;overflow:hidden;border:2px solid ' + (isActive ? 'var(--primary)' : 'var(--border)') + ';cursor:pointer;flex-shrink:0;transition:border-color 0.15s;" onclick="switchBgHistory(\'' + h.id + '\')">' +
+                    (thumbSrc ? '<img src="' + thumbSrc + '" style="width:100%;height:100%;object-fit:cover;" alt="">' : '<div style="width:100%;height:100%;background:var(--surface-dim);display:flex;align-items:center;justify-content:center;"><i data-lucide="image" style="width:24px;height:24px;color:var(--text-3);"></i></div>') +
+                    '<div style="position:absolute;top:-2px;right:-2px;width:22px;height:22px;border-radius:50%;background:var(--error);border:2px solid white;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2;" onclick="event.stopPropagation();deleteBgHistory(\'' + h.id + '\')">' +
+                    '<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"></line><line x1="18" y1="6" x2="6" y2="18"></line></svg></div>' +
+                    (isActive ? '<div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--primary);"></div>' : '') +
+                    '</div>';
+            }).join('');
+        });
+    }
+
+    function compressBgImage(dataUrl, maxBytes, callback) {
+        maxBytes = maxBytes || 2000000;
+        var img = new Image();
+        img.onload = function() {
+            var base64Len = dataUrl.length - dataUrl.indexOf(',') - 1;
+            var rawBytes = Math.ceil(base64Len * 3 / 4);
+            if (rawBytes <= maxBytes) {
+                callback(dataUrl, img.naturalWidth, img.naturalHeight);
+                return;
+            }
+            var w = img.naturalWidth;
+            var h = img.naturalHeight;
+            var maxDim = 1920;
+            if (w > maxDim || h > maxDim) {
+                if (w > h) { h = Math.round(h * maxDim / w); w = maxDim; }
+                else { w = Math.round(w * maxDim / h); h = maxDim; }
+            }
+            var canvas = document.createElement('canvas');
+            canvas.width = w;
+            canvas.height = h;
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, w, h);
+            var lo = 0.1, hi = 0.95;
+            var bestUrl = canvas.toDataURL('image/jpeg', lo);
+            for (var i = 0; i < 8; i++) {
+                var mid = (lo + hi) / 2;
+                var url = canvas.toDataURL('image/jpeg', mid);
+                var bLen = url.length - url.indexOf(',') - 1;
+                var bytes = Math.ceil(bLen * 3 / 4);
+                if (bytes <= maxBytes) {
+                    bestUrl = url;
+                    lo = mid;
+                } else {
+                    hi = mid;
+                }
+            }
+            callback(bestUrl, w, h);
+        };
+        img.src = dataUrl;
+    }
 
     function uploadBackground() {
         if (isAndroid && NativeBridge.pickImage) {
@@ -3302,189 +3386,157 @@
     };
 
     function showBgPositionDialog(dataUrl) {
-        bgPreviewOffX = 0;
-        bgPreviewOffY = 0;
-        bgPreviewScale = 1;
-        bgPreviewRotation = 0;
-        const img = document.getElementById('bg-preview-img');
-        img.src = dataUrl;
-        img.onload = function() {
-            bgPreviewNaturalW = img.naturalWidth;
-            bgPreviewNaturalH = img.naturalHeight;
-            const viewW = document.documentElement.clientWidth || 360;
-            const viewH = document.documentElement.clientHeight || 640;
-            const maxW = Math.min(Math.round(viewW * 0.85), 340);
-            const maxH = Math.round(viewH * 0.45);
-            const imgRatio = bgPreviewNaturalW / bgPreviewNaturalH;
-            let containerW, containerH;
-            if (imgRatio > maxW / maxH) {
-                containerW = maxW;
-                containerH = Math.round(maxW / imgRatio);
-            } else {
-                containerH = maxH;
-                containerW = Math.round(maxH * imgRatio);
-            }
-            bgPreviewContainerW = containerW;
-            bgPreviewContainerH = containerH;
-            const container = document.getElementById('bg-crop-container');
-            container.style.width = containerW + 'px';
-            container.style.height = containerH + 'px';
-            // Dashed rect: device screen ratio centered in container
-            const screenRatio = viewW / viewH;
-            let rectW, rectH;
-            if (screenRatio > imgRatio) {
-                rectW = containerW * 0.85;
-                rectH = rectW / screenRatio;
-            } else {
-                rectH = containerH * 0.85;
-                rectW = rectH * screenRatio;
-            }
-            const rectX = (containerW - rectW) / 2;
-            const rectY = (containerH - rectH) / 2;
-            const rect = document.getElementById('bg-screen-rect');
-            rect.style.left = rectX + 'px';
-            rect.style.top = rectY + 'px';
-            rect.style.width = rectW + 'px';
-            rect.style.height = rectH + 'px';
-            updateBgPreview();
-            setupBgPositionGestures();
+        // Compress image first, then show CropperJS preview
+        compressBgImage(dataUrl, 2000000, function(compressedUrl, natW, natH) {
+            bgNaturalW = natW;
+            bgNaturalH = natH;
+            var img = document.getElementById('bg-preview-img');
+            // Destroy previous cropper instance
+            if (bgCropper) { bgCropper.destroy(); bgCropper = null; }
+            // Show dialog FIRST (CropperJS requires visible container for correct sizing)
             showDialog('bg-crop-dialog');
-        };
+            // Set image source after dialog is visible
+            img.onload = function() {
+                if (!natW) { bgNaturalW = img.naturalWidth; bgNaturalH = img.naturalHeight; }
+                // Device screen ratio for crop box
+                var screenW = document.documentElement.clientWidth || 360;
+                var screenH = document.documentElement.clientHeight || 640;
+                var screenRatio = screenW / screenH;
+                // Initialize CropperJS
+                if (typeof Cropper === 'undefined') {
+                    showToast('裁剪组件加载失败，请检查网络后重试', 'error');
+                    return;
+                }
+                // Wait for dialog to be fully rendered before initializing CropperJS
+                setTimeout(function() {
+                    try {
+                        bgCropper = new Cropper(img, {
+                            aspectRatio: screenRatio,
+                            viewMode: 1,
+                            autoCropArea: 0.8,
+                            guides: true,
+                            center: true,
+                            cropBoxMovable: false,
+                            cropBoxResizable: false,
+                            wheelZoomRatio: 0.1,
+                            minZoomRatio: 0.3,
+                            maxZoomRatio: 5,
+                            background: false,
+                            responsive: true,
+                            ready: function() {
+                                // Cropper is ready
+                            }
+                        });
+                    } catch(e) {
+                        showToast('裁剪组件初始化失败: ' + e.message, 'error');
+                    }
+                }, 150);
+            };
+            img.src = compressedUrl;
+        });
     }
 
-    function updateBgPreview() {
-        const img = document.getElementById('bg-preview-img');
-        if (!img || !bgPreviewNaturalW) return;
-        const cW = bgPreviewContainerW;
-        const cH = bgPreviewContainerH;
-        const scale = bgPreviewScale;
-        const rot = bgPreviewRotation;
-        // Calculate enlarged size to cover container after rotation
-        const rad = rot * Math.PI / 180;
-        const absCos = Math.abs(Math.cos(rad));
-        const absSin = Math.abs(Math.sin(rad));
-        const rotW = cW * absCos + cH * absSin;
-        const rotH = cW * absSin + cH * absCos;
-        // Apply user scale
-        const imgW = rotW * scale;
-        const imgH = rotH * scale;
-        img.style.width = imgW + 'px';
-        img.style.height = imgH + 'px';
-        img.style.objectFit = 'cover';
-        // Position: center + offset
-        const left = (cW - imgW) / 2 + bgPreviewOffX;
-        const top = (cH - imgH) / 2 + bgPreviewOffY;
-        img.style.position = 'absolute';
-        img.style.left = left + 'px';
-        img.style.top = top + 'px';
-        img.style.transform = 'rotate(' + rot + 'deg)';
-        img.style.transformOrigin = 'center center';
-    }
-
-    function setupBgPositionGestures() {
-        const container = document.getElementById('bg-crop-container');
-        let dragging = false;
-        let startX = 0, startY = 0;
-        let startOffX = 0, startOffY = 0;
-        let pinching = false;
-        let lastPinchDist = 0;
-        let startScale = 1;
-        let lastAngle = 0;
-        let startRotation = 0;
-
-        container.ontouchstart = function(e) {
-            if (e.touches.length === 2) {
-                dragging = false;
-                pinching = true;
-                const dx = e.touches[1].clientX - e.touches[0].clientX;
-                const dy = e.touches[1].clientY - e.touches[0].clientY;
-                lastPinchDist = Math.sqrt(dx * dx + dy * dy);
-                startScale = bgPreviewScale;
-                lastAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-                startRotation = bgPreviewRotation;
-                e.preventDefault();
-            } else if (e.touches.length === 1) {
-                pinching = false;
-                dragging = true;
-                startX = e.touches[0].clientX;
-                startY = e.touches[0].clientY;
-                startOffX = bgPreviewOffX;
-                startOffY = bgPreviewOffY;
-            }
-        };
-        container.ontouchmove = function(e) {
-            e.preventDefault();
-            if (pinching && e.touches.length === 2) {
-                const dx = e.touches[1].clientX - e.touches[0].clientX;
-                const dy = e.touches[1].clientY - e.touches[0].clientY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                bgPreviewScale = Math.max(1, Math.min(startScale * (dist / lastPinchDist), 5));
-                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-                bgPreviewRotation = startRotation + (angle - lastAngle);
-                updateBgPreview();
-            } else if (dragging && e.touches.length === 1) {
-                const dx = e.touches[0].clientX - startX;
-                const dy = e.touches[0].clientY - startY;
-                bgPreviewOffX = startOffX + dx;
-                bgPreviewOffY = startOffY + dy;
-                updateBgPreview();
-            }
-        };
-        container.ontouchend = function(e) {
-            if (e.touches.length < 2) pinching = false;
-            if (e.touches.length === 0) dragging = false;
-        };
+    function rotateBgPreview(deg) {
+        if (bgCropper) {
+            bgCropper.rotate(deg);
+        }
     }
 
     function applyBgPosition() {
-        bgImageData = document.getElementById('bg-preview-img').src;
-        bgOffX = bgPreviewOffX;
-        bgOffY = bgPreviewOffY;
-        bgScale = bgPreviewScale;
-        bgRotation = bgPreviewRotation;
-        bgNaturalW = bgPreviewNaturalW;
-        bgNaturalH = bgPreviewNaturalH;
-        try {
-            localStorage.setItem('ck_bg_image', bgImageData);
-        } catch(e) {
-            showToast('背景图片过大，无法保存', 'warning');
+        if (!bgCropper) return;
+        // Use getCroppedCanvas() to get the actual cropped image (WYSIWYG)
+        var croppedCanvas = bgCropper.getCroppedCanvas({ maxWidth: 1080, maxHeight: 1920 });
+        if (!croppedCanvas) {
+            showToast('裁剪失败，请重试', 'error');
+            return;
         }
-        localStorage.setItem('ck_bg_off_x', String(bgOffX));
-        localStorage.setItem('ck_bg_off_y', String(bgOffY));
-        localStorage.setItem('ck_bg_scale', String(bgScale));
-        localStorage.setItem('ck_bg_rotation', String(bgRotation));
-        localStorage.setItem('ck_bg_natural_w', String(bgNaturalW));
-        localStorage.setItem('ck_bg_natural_h', String(bgNaturalH));
-        localStorage.setItem('ck_bg_opacity', String(bgOpacity));
-        localStorage.setItem('ck_bg_blur', String(bgBlur));
-        applyCustomBackground();
-        hideDialog('bg-crop-dialog');
-        updateBgUI();
-        showToast('背景已应用', 'success');
+        // Compress the cropped result to 2MB
+        var rawDataUrl = croppedCanvas.toDataURL('image/jpeg', 0.8);
+        compressBgImage(rawDataUrl, 2000000, function(compressedUrl) {
+            bgImageData = compressedUrl;
+            bgIsCropped = true;
+            // Clear old format parameters
+            bgCenterX = 0; bgCenterY = 0;
+            bgCropW = 0; bgCropH = 0;
+            bgRotation = 0;
+            bgNaturalW = 0; bgNaturalH = 0;
+            // Save to external file (avoid localStorage quota)
+            if (isAndroid && NativeBridge.saveBgImage) {
+                try {
+                    var rawBase64 = compressedUrl.substring(compressedUrl.indexOf(',') + 1);
+                    var fileName = 'bg_' + Date.now() + '.jpg';
+                    bgFilePath = NativeBridge.saveBgImage(rawBase64, fileName);
+                    if (bgFilePath) {
+                        localStorage.setItem('ck_bg_file_path', bgFilePath);
+                    }
+                } catch(e) {
+                    bgFilePath = '';
+                }
+            }
+            // Fallback: save to localStorage if NativeBridge not available
+            if (!bgFilePath) {
+                try {
+                    localStorage.setItem('ck_bg_image', bgImageData);
+                } catch(e) {
+                    showToast('背景图片过大，无法保存', 'warning');
+                }
+            } else {
+                localStorage.removeItem('ck_bg_image');
+            }
+            localStorage.setItem('ck_bg_is_cropped', '1');
+            localStorage.setItem('ck_bg_opacity', String(bgOpacity));
+            localStorage.setItem('ck_bg_blur', String(bgBlur));
+            // Remove old format keys
+            ['ck_bg_center_x','ck_bg_center_y','ck_bg_crop_w','ck_bg_crop_h','ck_bg_rotation','ck_bg_natural_w','ck_bg_natural_h'].forEach(function(k) {
+                localStorage.removeItem(k);
+            });
+            // Add to history (use original file for display, no separate thumbnail)
+            addBgToHistory(bgFilePath || '', bgOpacity, bgBlur, true);
+            // Destroy cropper
+            bgCropper.destroy();
+            bgCropper = null;
+            applyCustomBackground();
+            hideDialog('bg-crop-dialog');
+            updateBgUI();
+            renderBgHistory();
+            showToast('背景已应用', 'success');
+        });
     }
 
     function cancelBgPosition() {
+        if (bgCropper) { bgCropper.destroy(); bgCropper = null; }
         hideDialog('bg-crop-dialog');
     }
 
     function removeBackground() {
+        // Only delete file if not referenced by any history entry
+        if (bgFilePath && isAndroid && NativeBridge.deleteBgImage) {
+            var inHistory = bgHistory.some(function(h) { return h.filePath === bgFilePath; });
+            if (!inHistory) {
+                try { NativeBridge.deleteBgImage(bgFilePath); } catch(e) {}
+            }
+        }
         bgImageData = '';
-        bgOffX = 0;
-        bgOffY = 0;
-        bgScale = 1;
+        bgFilePath = '';
+        bgIsCropped = false;
+        bgCenterX = 0; bgCenterY = 0;
+        bgCropW = 0; bgCropH = 0;
         bgRotation = 0;
-        bgNaturalW = 0;
-        bgNaturalH = 0;
+        bgNaturalW = 0; bgNaturalH = 0;
         localStorage.removeItem('ck_bg_image');
-        localStorage.removeItem('ck_bg_off_x');
-        localStorage.removeItem('ck_bg_off_y');
-        localStorage.removeItem('ck_bg_scale');
+        localStorage.removeItem('ck_bg_file_path');
+        localStorage.removeItem('ck_bg_is_cropped');
+        localStorage.removeItem('ck_bg_center_x');
+        localStorage.removeItem('ck_bg_center_y');
+        localStorage.removeItem('ck_bg_crop_w');
+        localStorage.removeItem('ck_bg_crop_h');
         localStorage.removeItem('ck_bg_rotation');
         localStorage.removeItem('ck_bg_natural_w');
         localStorage.removeItem('ck_bg_natural_h');
         applyCustomBackground();
         updateBgUI();
-        showToast('背景已移除', 'success');
+        renderBgHistory();
+        showToast('背景已取消', 'success');
     }
 
     function updateBgOpacity(val) {
@@ -3518,7 +3570,7 @@
         if (!bgImageData) {
             layer.style.display = 'none';
             img.src = '';
-            img.style.transform = '';
+            img.style.cssText = 'position:absolute;';
             root.style.removeProperty('--custom-screen-bg');
             root.style.removeProperty('--custom-surface-bg');
             root.style.removeProperty('--custom-nav-bg');
@@ -3526,62 +3578,49 @@
         }
         layer.style.display = 'block';
         img.src = bgImageData;
-        // Calculate cover dimensions for the viewport
-        const layerW = window.innerWidth;
-        const layerH = window.innerHeight;
-        const scale = bgScale || 1;
-        const rot = bgRotation || 0;
-        // Calculate image size: cover the viewport, then enlarge for rotation
-        if (bgNaturalW && bgNaturalH) {
-            const imgRatio = bgNaturalW / bgNaturalH;
-            const layerRatio = layerW / layerH;
-            let coverW, coverH;
-            if (imgRatio > layerRatio) {
-                coverH = layerH;
-                coverW = layerH * imgRatio;
-            } else {
-                coverW = layerW;
-                coverH = layerW / imgRatio;
-            }
-            // Enlarge for rotation to prevent black edges
-            const rad = rot * Math.PI / 180;
-            const absCos = Math.abs(Math.cos(rad));
-            const absSin = Math.abs(Math.sin(rad));
-            const rotW = layerW * absCos + layerH * absSin;
-            const rotH = layerW * absSin + layerH * absCos;
-            // Use the larger of cover size and rotation-compensated size
-            const finalW = Math.max(coverW, rotW) * scale;
-            const finalH = Math.max(coverH, rotH) * scale;
-            img.style.width = finalW + 'px';
-            img.style.height = finalH + 'px';
-            img.style.objectFit = 'cover';
-            // Position: center + offset (scale from preview to screen)
-            const pW = bgPreviewContainerW || layerW;
-            const pH = bgPreviewContainerH || layerH;
-            const scaleX = layerW / pW;
-            const scaleY = layerH / pH;
-            const left = (layerW - finalW) / 2 + bgOffX * scaleX;
-            const top = (layerH - finalH) / 2 + bgOffY * scaleY;
+        if (bgIsCropped) {
+            // NEW FORMAT: Cropped image from getCroppedCanvas() - simple object-fit:cover
+            img.style.cssText = 'position:absolute;top:0;left:0;width:100%;height:100%;object-fit:cover;object-position:center;';
+        } else if (bgCropW > 0 && bgCropH > 0) {
+            // OLD FORMAT: Manual center-point rendering (backward compatibility)
+            const screenW = window.innerWidth;
+            const screenH = window.innerHeight;
+            const rot = bgRotation || 0;
+            const sf = Math.max(screenW / bgCropW, screenH / bgCropH);
+            const displayW = bgNaturalW * sf;
+            const displayH = bgNaturalH * sf;
+            const refX = bgCenterX * sf;
+            const refY = bgCenterY * sf;
+            const imgCenterX = displayW / 2;
+            const imgCenterY = displayH / 2;
+            const rotRad = rot * Math.PI / 180;
+            const dx = refX - imgCenterX;
+            const dy = refY - imgCenterY;
+            const rotatedRefX = imgCenterX + dx * Math.cos(rotRad) - dy * Math.sin(rotRad);
+            const rotatedRefY = imgCenterY + dx * Math.sin(rotRad) + dy * Math.cos(rotRad);
+            const left = screenW / 2 - rotatedRefX;
+            const top = screenH / 2 - rotatedRefY;
+            img.style.cssText = 'position:absolute;object-fit:fill;';
+            img.style.width = displayW + 'px';
+            img.style.height = displayH + 'px';
             img.style.left = left + 'px';
             img.style.top = top + 'px';
+            img.style.transformOrigin = imgCenterX + 'px ' + imgCenterY + 'px';
+            img.style.transform = rot ? 'rotate(' + rot + 'deg)' : '';
         } else {
-            img.style.width = (layerW * scale) + 'px';
-            img.style.height = (layerH * scale) + 'px';
-            img.style.objectFit = 'cover';
-            img.style.left = '0px';
-            img.style.top = '0px';
+            // Fallback: no valid format data, hide background
+            layer.style.display = 'none';
+            img.src = '';
+            img.style.cssText = 'position:absolute;';
+            root.style.removeProperty('--custom-screen-bg');
+            root.style.removeProperty('--custom-surface-bg');
+            root.style.removeProperty('--custom-nav-bg');
+            return;
         }
         // Blur
         const blurPx = Math.round(bgBlur * 0.2);
         layer.style.filter = 'blur(' + blurPx + 'px)';
-        // Rotation
-        if (rot && rot !== 0) {
-            img.style.transform = 'rotate(' + rot + 'deg)';
-            img.style.transformOrigin = 'center center';
-        } else {
-            img.style.transform = '';
-        }
-        // Apply alpha to UI layers
+        // Apply alpha
         const alpha = Math.max(0.1, 1 - bgOpacity / 100);
         const isDark = root.getAttribute('data-theme') === 'dark';
         const bgR = isDark ? 26 : 240;
@@ -3622,6 +3661,7 @@
                 controls.style.display = 'none';
             }
         });
+        renderBgHistory();
     }
 
     // ===== USAGE STATS =====

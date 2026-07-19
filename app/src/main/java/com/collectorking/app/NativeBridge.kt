@@ -483,4 +483,64 @@ class NativeBridge(private val activity: Activity) {
     fun exitApp() {
         activity.runOnUiThread { activity.moveTaskToBack(true) }
     }
+
+    /**
+     * Save a base64-encoded background image to external storage.
+     * Called from JS: NativeBridge.saveBgImage(base64Data, fileName)
+     * Returns the file path, or empty string on failure.
+     */
+    @JavascriptInterface
+    fun saveBgImage(base64Data: String, fileName: String): String {
+        return try {
+            val bgDir = File(activity.getExternalFilesDir(null), "backgrounds")
+            if (!bgDir.exists()) bgDir.mkdirs()
+            val file = File(bgDir, fileName)
+            val bytes = Base64.decode(base64Data, Base64.NO_WRAP)
+            file.writeBytes(bytes)
+            file.absolutePath
+        } catch (e: Exception) {
+            ""
+        }
+    }
+
+    /**
+     * Delete a background image file by path.
+     * Called from JS: NativeBridge.deleteBgImage(path)
+     */
+    @JavascriptInterface
+    fun deleteBgImage(path: String): Boolean {
+        return try {
+            val file = File(path)
+            if (file.exists() && file.absolutePath.contains(activity.packageName)) file.delete() else false
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    /**
+     * Delete all background image files.
+     * Called from JS: NativeBridge.deleteAllBgImages()
+     * Returns the number of files deleted.
+     */
+    @JavascriptInterface
+    fun deleteAllBgImages(): Int {
+        val bgDir = File(activity.getExternalFilesDir(null), "backgrounds")
+        if (!bgDir.exists()) return 0
+        var count = 0
+        bgDir.listFiles()?.forEach { file ->
+            if (file.isFile) { file.delete(); count++ }
+        }
+        return count
+    }
+
+    /**
+     * Get total size of backgrounds directory in KB.
+     * Called from JS: NativeBridge.getBgSizeKB()
+     */
+    @JavascriptInterface
+    fun getBgSizeKB(): Long {
+        val bgDir = File(activity.getExternalFilesDir(null), "backgrounds")
+        if (!bgDir.exists()) return 0
+        return bgDir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1024
+    }
 }
