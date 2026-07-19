@@ -132,7 +132,7 @@
     <div id="app">
         <!-- Background layer -->
         <div id="custom-bg-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;overflow:hidden;">
-            <img id="custom-bg-img" style="position:absolute;min-width:100%;min-height:100%;object-fit:cover;" src="" alt="">
+            <img id="custom-bg-img" style="position:absolute;object-fit:cover;" src="" alt="">
         </div>
 
         <!-- ===== TAB 1: HOME ===== -->
@@ -1641,17 +1641,17 @@
         }
         container.innerHTML = templates.map((t, idx) => `
             <div class="card tpl-sort-card" style="margin-bottom:12px;transition:transform 0.2s,box-shadow 0.2s,opacity 0.2s;" data-tpl-id="${t.id}" data-tpl-idx="${idx}">
-                <div style="display:flex;align-items:center;">
-                    <div style="width:48px;height:48px;border-radius:14px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                        <i data-lucide="${t.icon}" style="width:24px;height:24px;color:${t.iconColor};"></i>
+                <div style="display:flex;align-items:center;padding:12px 4px 12px 12px;">
+                    <div style="width:44px;height:44px;border-radius:12px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                        <i data-lucide="${t.icon}" style="width:22px;height:22px;color:${t.iconColor};"></i>
                     </div>
-                    <div style="flex:1;min-width:0;padding:14px 12px;">
-                        <div style="font-size:16px;font-weight:600;color:var(--text-1);">${t.name}</div>
-                        <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
-                        <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
+                    <div style="flex:1;min-width:0;padding:0 10px;">
+                        <div style="font-size:15px;font-weight:600;color:var(--text-1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.name}</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${t.desc || ''}</div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:2px;">${t.types.length}种证件</div>
                     </div>
-                    <div style="padding:8px 10px;flex-shrink:0;touch-action:none;" ontouchstart="onTplDragHandleTouch(event,'${t.id}')" ontouchend="onTplDragHandleTouchEnd(event)">
-                        <i data-lucide="grip-vertical" style="width:18px;height:18px;color:var(--text-3);opacity:0.4;"></i>
+                    <div style="padding:12px 8px;flex-shrink:0;touch-action:none;display:flex;align-items:center;" ontouchstart="onTplDragHandleTouch(event,'${t.id}')" ontouchend="onTplDragHandleTouchEnd(event)">
+                        <i data-lucide="grip-vertical" style="width:16px;height:16px;color:var(--text-3);opacity:0.35;"></i>
                     </div>
                 </div>
                 <div style="display:flex;border-top:1px solid var(--border);">
@@ -1671,9 +1671,11 @@
     let tplDragStartY = 0;
     let tplLongPressTimer = null;
     let tplLongPressId = null;
+    let tplDragAbsY = 0;
 
     function onTplDragHandleTouch(e, id) {
         e.stopPropagation();
+        e.preventDefault();
         tplLongPressId = id;
         tplLongPressTimer = setTimeout(function() {
             tplLongPressTimer = null;
@@ -1713,10 +1715,12 @@
         // Dim original
         origCard.style.opacity = '0.25';
         tplDragStartY = touch.clientY;
+        tplDragAbsY = rect.top;
         if (navigator.vibrate) navigator.vibrate(25);
         showToast('上下拖动排序', 'bottom');
         document.addEventListener('touchmove', onTplDragMove, { passive: false });
         document.addEventListener('touchend', onTplDragEnd);
+        document.addEventListener('touchcancel', onTplDragEnd);
     }
 
     function onTplDragMove(e) {
@@ -1724,13 +1728,13 @@
         e.preventDefault();
         const touch = e.touches[0];
         const dy = touch.clientY - tplDragStartY;
-        // Only vertical movement
-        const rect = tplDragClone.getBoundingClientRect();
-        tplDragClone.style.top = (rect.top + dy) + 'px';
+        tplDragAbsY += dy;
+        tplDragClone.style.top = tplDragAbsY + 'px';
         tplDragStartY = touch.clientY;
         // Check swap
         const cards = Array.from(document.querySelectorAll('#template-list .tpl-sort-card'));
-        const cloneCenterY = parseFloat(tplDragClone.style.top) + rect.height / 2;
+        const cloneH = tplDragClone.offsetHeight || 80;
+        const cloneCenterY = tplDragAbsY + cloneH / 2;
         for (let i = 0; i < cards.length; i++) {
             if (i === tplDragIdx) continue;
             const cardRect = cards[i].getBoundingClientRect();
@@ -1782,9 +1786,11 @@
             tplDragClone = null;
         }
         tplDragIdx = -1;
+        tplDragAbsY = 0;
         document.querySelectorAll('#template-list .tpl-sort-card').forEach(function(c) { c.style.opacity = ''; });
         document.removeEventListener('touchmove', onTplDragMove);
         document.removeEventListener('touchend', onTplDragEnd);
+        document.removeEventListener('touchcancel', onTplDragEnd);
         renderHomeList();
         saveTemplates();
     }
@@ -1889,8 +1895,11 @@
     let typeSortStartX = 0;
     let typeSortStartY = 0;
     let typeSortLongPress = null;
+    let typeSortAbsX = 0;
+    let typeSortAbsY = 0;
 
     function onTypeSortTouchStart(e, idx) {
+        e.preventDefault();
         typeSortLongPress = setTimeout(function() {
             typeSortLongPress = null;
             startTypeSortDrag(idx, e.touches[0]);
@@ -1925,9 +1934,12 @@
         origItem.style.opacity = '0.25';
         typeSortStartX = touch.clientX;
         typeSortStartY = touch.clientY;
+        typeSortAbsX = rect.left;
+        typeSortAbsY = rect.top;
         if (navigator.vibrate) navigator.vibrate(20);
         document.addEventListener('touchmove', onTypeSortMove, { passive: false });
         document.addEventListener('touchend', onTypeSortEnd);
+        document.addEventListener('touchcancel', onTypeSortEnd);
     }
 
     function onTypeSortMove(e) {
@@ -1936,16 +1948,18 @@
         const touch = e.touches[0];
         const dx = touch.clientX - typeSortStartX;
         const dy = touch.clientY - typeSortStartY;
-        const rect = typeSortClone.getBoundingClientRect();
-        typeSortClone.style.left = (rect.left + dx) + 'px';
-        typeSortClone.style.top = (rect.top + dy) + 'px';
+        typeSortAbsX += dx;
+        typeSortAbsY += dy;
+        typeSortClone.style.left = typeSortAbsX + 'px';
+        typeSortClone.style.top = typeSortAbsY + 'px';
         typeSortStartX = touch.clientX;
         typeSortStartY = touch.clientY;
         // Check swap by overlap
         const items = Array.from(document.querySelectorAll('#tpl-type-selected .type-sort-item'));
-        const cloneRect = typeSortClone.getBoundingClientRect();
-        const cloneCX = cloneRect.left + cloneRect.width / 2;
-        const cloneCY = cloneRect.top + cloneRect.height / 2;
+        const cloneW = typeSortClone.offsetWidth || 80;
+        const cloneH = typeSortClone.offsetHeight || 30;
+        const cloneCX = typeSortAbsX + cloneW / 2;
+        const cloneCY = typeSortAbsY + cloneH / 2;
         for (let i = 0; i < items.length; i++) {
             if (i === typeSortIdx) continue;
             const r = items[i].getBoundingClientRect();
@@ -1984,9 +1998,12 @@
             typeSortClone = null;
         }
         typeSortIdx = -1;
+        typeSortAbsX = 0;
+        typeSortAbsY = 0;
         document.querySelectorAll('#tpl-type-selected .type-sort-item').forEach(function(el) { el.style.opacity = ''; });
         document.removeEventListener('touchmove', onTypeSortMove);
         document.removeEventListener('touchend', onTypeSortEnd);
+        document.removeEventListener('touchcancel', onTypeSortEnd);
     }
 
     function toggleType(id) {
@@ -3341,17 +3358,26 @@
         const cW = bgPreviewContainerW;
         const cH = bgPreviewContainerH;
         const scale = bgPreviewScale;
-        // Image size: cover the container * scale
-        img.style.width = (cW * scale) + 'px';
-        img.style.height = (cH * scale) + 'px';
+        const rot = bgPreviewRotation;
+        // Calculate enlarged size to cover container after rotation
+        const rad = rot * Math.PI / 180;
+        const absCos = Math.abs(Math.cos(rad));
+        const absSin = Math.abs(Math.sin(rad));
+        const rotW = cW * absCos + cH * absSin;
+        const rotH = cW * absSin + cH * absCos;
+        // Apply user scale
+        const imgW = rotW * scale;
+        const imgH = rotH * scale;
+        img.style.width = imgW + 'px';
+        img.style.height = imgH + 'px';
         img.style.objectFit = 'cover';
         // Position: center + offset
-        const left = (cW - cW * scale) / 2 + bgPreviewOffX;
-        const top = (cH - cH * scale) / 2 + bgPreviewOffY;
+        const left = (cW - imgW) / 2 + bgPreviewOffX;
+        const top = (cH - imgH) / 2 + bgPreviewOffY;
         img.style.position = 'absolute';
         img.style.left = left + 'px';
         img.style.top = top + 'px';
-        img.style.transform = 'rotate(' + bgPreviewRotation + 'deg)';
+        img.style.transform = 'rotate(' + rot + 'deg)';
         img.style.transformOrigin = 'center center';
     }
 
@@ -3504,6 +3530,8 @@
         const layerW = window.innerWidth;
         const layerH = window.innerHeight;
         const scale = bgScale || 1;
+        const rot = bgRotation || 0;
+        // Calculate image size: cover the viewport, then enlarge for rotation
         if (bgNaturalW && bgNaturalH) {
             const imgRatio = bgNaturalW / bgNaturalH;
             const layerRatio = layerW / layerH;
@@ -3515,26 +3543,40 @@
                 coverW = layerW;
                 coverH = layerW / imgRatio;
             }
-            img.style.width = (coverW * scale) + 'px';
-            img.style.height = (coverH * scale) + 'px';
+            // Enlarge for rotation to prevent black edges
+            const rad = rot * Math.PI / 180;
+            const absCos = Math.abs(Math.cos(rad));
+            const absSin = Math.abs(Math.sin(rad));
+            const rotW = layerW * absCos + layerH * absSin;
+            const rotH = layerW * absSin + layerH * absCos;
+            // Use the larger of cover size and rotation-compensated size
+            const finalW = Math.max(coverW, rotW) * scale;
+            const finalH = Math.max(coverH, rotH) * scale;
+            img.style.width = finalW + 'px';
+            img.style.height = finalH + 'px';
+            img.style.objectFit = 'cover';
+            // Position: center + offset (scale from preview to screen)
+            const pW = bgPreviewContainerW || layerW;
+            const pH = bgPreviewContainerH || layerH;
+            const scaleX = layerW / pW;
+            const scaleY = layerH / pH;
+            const left = (layerW - finalW) / 2 + bgOffX * scaleX;
+            const top = (layerH - finalH) / 2 + bgOffY * scaleY;
+            img.style.left = left + 'px';
+            img.style.top = top + 'px';
         } else {
             img.style.width = (layerW * scale) + 'px';
             img.style.height = (layerH * scale) + 'px';
             img.style.objectFit = 'cover';
+            img.style.left = '0px';
+            img.style.top = '0px';
         }
-        // Position: center + offset (scale offset from preview to screen)
-        const previewToScreenX = layerW / (bgPreviewContainerW || layerW);
-        const previewToScreenY = layerH / (bgPreviewContainerH || layerH);
-        const left = (layerW - img.offsetWidth) / 2 + bgOffX * (layerW / 340);
-        const top = (layerH - img.offsetHeight) / 2 + bgOffY * (layerH / 400);
-        img.style.left = left + 'px';
-        img.style.top = top + 'px';
         // Blur
         const blurPx = Math.round(bgBlur * 0.2);
         layer.style.filter = 'blur(' + blurPx + 'px)';
         // Rotation
-        if (bgRotation && bgRotation !== 0) {
-            img.style.transform = 'rotate(' + bgRotation + 'deg)';
+        if (rot && rot !== 0) {
+            img.style.transform = 'rotate(' + rot + 'deg)';
             img.style.transformOrigin = 'center center';
         } else {
             img.style.transform = '';
