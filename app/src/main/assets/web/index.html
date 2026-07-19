@@ -131,7 +131,9 @@
 <body>
     <div id="app">
         <!-- Background layer -->
-        <div id="custom-bg-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;"></div>
+        <div id="custom-bg-layer" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;overflow:hidden;">
+            <img id="custom-bg-img" style="position:absolute;min-width:100%;min-height:100%;object-fit:cover;" src="" alt="">
+        </div>
 
         <!-- ===== TAB 1: HOME ===== -->
         <div class="screen active" id="tab-home">
@@ -1648,8 +1650,8 @@
                         <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
                         <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
                     </div>
-                    <div style="padding:8px 12px;flex-shrink:0;touch-action:none;" ontouchstart="onTplDragHandleTouch(event,'${t.id}')" ontouchend="onTplDragHandleTouchEnd(event)">
-                        <i data-lucide="grip-vertical" style="width:28px;height:28px;color:var(--text-3);opacity:0.5;"></i>
+                    <div style="padding:8px 10px;flex-shrink:0;touch-action:none;" ontouchstart="onTplDragHandleTouch(event,'${t.id}')" ontouchend="onTplDragHandleTouchEnd(event)">
+                        <i data-lucide="grip-vertical" style="width:18px;height:18px;color:var(--text-3);opacity:0.4;"></i>
                     </div>
                 </div>
                 <div style="display:flex;border-top:1px solid var(--border);">
@@ -1667,8 +1669,6 @@
     let tplDragIdx = -1;
     let tplDragClone = null;
     let tplDragStartY = 0;
-    let tplDragOffsetY = 0;
-    let tplDragScrollStart = 0;
     let tplLongPressTimer = null;
     let tplLongPressId = null;
 
@@ -1693,30 +1693,28 @@
         if (idx < 0) return;
         tplDragging = true;
         tplDragIdx = idx;
-        // Create floating clone
         const cards = document.querySelectorAll('#template-list .tpl-sort-card');
         const origCard = cards[idx];
         if (!origCard) return;
         const rect = origCard.getBoundingClientRect();
+        // Create floating clone
         tplDragClone = origCard.cloneNode(true);
         tplDragClone.style.position = 'fixed';
         tplDragClone.style.left = rect.left + 'px';
         tplDragClone.style.top = rect.top + 'px';
         tplDragClone.style.width = rect.width + 'px';
         tplDragClone.style.zIndex = '100';
-        tplDragClone.style.opacity = '0.92';
-        tplDragClone.style.transform = 'scale(1.04)';
-        tplDragClone.style.boxShadow = '0 8px 30px rgba(0,0,0,0.2)';
+        tplDragClone.style.opacity = '0.9';
+        tplDragClone.style.transform = 'scale(1.03)';
+        tplDragClone.style.boxShadow = '0 8px 30px rgba(0,0,0,0.18)';
         tplDragClone.style.pointerEvents = 'none';
-        tplDragClone.style.transition = 'transform 0.15s, box-shadow 0.15s';
+        tplDragClone.style.transition = 'none';
         document.body.appendChild(tplDragClone);
         // Dim original
-        origCard.style.opacity = '0.3';
+        origCard.style.opacity = '0.25';
         tplDragStartY = touch.clientY;
-        tplDragOffsetY = 0;
-        // Vibrate feedback
-        if (navigator.vibrate) navigator.vibrate(30);
-        showToast('拖动排序中', 'bottom');
+        if (navigator.vibrate) navigator.vibrate(25);
+        showToast('上下拖动排序', 'bottom');
         document.addEventListener('touchmove', onTplDragMove, { passive: false });
         document.addEventListener('touchend', onTplDragEnd);
     }
@@ -1726,29 +1724,25 @@
         e.preventDefault();
         const touch = e.touches[0];
         const dy = touch.clientY - tplDragStartY;
-        tplDragOffsetY = dy;
-        tplDragClone.style.transform = 'scale(1.04) translateY(' + dy + 'px)';
-        // Determine swap
+        // Only vertical movement
+        const rect = tplDragClone.getBoundingClientRect();
+        tplDragClone.style.top = (rect.top + dy) + 'px';
+        tplDragStartY = touch.clientY;
+        // Check swap
         const cards = Array.from(document.querySelectorAll('#template-list .tpl-sort-card'));
-        const dragCard = cards[tplDragIdx];
-        if (!dragCard) return;
-        const cloneRect = tplDragClone.getBoundingClientRect();
-        const cloneCenterY = cloneRect.top + cloneRect.height / 2;
+        const cloneCenterY = parseFloat(tplDragClone.style.top) + rect.height / 2;
         for (let i = 0; i < cards.length; i++) {
             if (i === tplDragIdx) continue;
-            const rect = cards[i].getBoundingClientRect();
-            const cardMid = rect.top + rect.height / 2;
+            const cardRect = cards[i].getBoundingClientRect();
+            const cardMid = cardRect.top + cardRect.height / 2;
             if (cloneCenterY < cardMid && i < tplDragIdx) {
                 const item = templates.splice(tplDragIdx, 1)[0];
                 templates.splice(i, 0, item);
                 tplDragIdx = i;
                 saveTemplates();
                 renderTemplateList();
-                // Re-dim the new position
                 const newCards = document.querySelectorAll('#template-list .tpl-sort-card');
-                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.3';
-                tplDragStartY = touch.clientY;
-                tplDragOffsetY = 0;
+                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.25';
                 break;
             } else if (cloneCenterY > cardMid && i > tplDragIdx) {
                 const item = templates.splice(tplDragIdx, 1)[0];
@@ -1757,9 +1751,7 @@
                 saveTemplates();
                 renderTemplateList();
                 const newCards = document.querySelectorAll('#template-list .tpl-sort-card');
-                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.3';
-                tplDragStartY = touch.clientY;
-                tplDragOffsetY = 0;
+                if (newCards[tplDragIdx]) newCards[tplDragIdx].style.opacity = '0.25';
                 break;
             }
         }
@@ -1768,17 +1760,28 @@
     function onTplDragEnd(e) {
         if (!tplDragging) return;
         tplDragging = false;
-        tplDragIdx = -1;
-        // Remove clone with animation
+        // Animate clone back to target position
         if (tplDragClone) {
-            tplDragClone.style.transition = 'transform 0.2s, opacity 0.2s';
-            tplDragClone.style.transform = 'scale(1)';
-            tplDragClone.style.opacity = '0';
-            const clone = tplDragClone;
-            setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 250);
+            const targetCard = document.querySelectorAll('#template-list .tpl-sort-card')[tplDragIdx];
+            if (targetCard) {
+                const targetRect = targetCard.getBoundingClientRect();
+                tplDragClone.style.transition = 'top 0.25s ease, left 0.25s ease, transform 0.25s ease, opacity 0.25s ease';
+                tplDragClone.style.top = targetRect.top + 'px';
+                tplDragClone.style.left = targetRect.left + 'px';
+                tplDragClone.style.transform = 'scale(1)';
+                tplDragClone.style.opacity = '0';
+                const clone = tplDragClone;
+                setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 300);
+            } else {
+                tplDragClone.style.transition = 'transform 0.2s, opacity 0.2s';
+                tplDragClone.style.transform = 'scale(1)';
+                tplDragClone.style.opacity = '0';
+                const clone = tplDragClone;
+                setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 250);
+            }
             tplDragClone = null;
         }
-        // Restore all cards opacity
+        tplDragIdx = -1;
         document.querySelectorAll('#template-list .tpl-sort-card').forEach(function(c) { c.style.opacity = ''; });
         document.removeEventListener('touchmove', onTplDragMove);
         document.removeEventListener('touchend', onTplDragEnd);
@@ -1879,10 +1882,11 @@
         lucide.createIcons();
     }
 
-    // Type sort drag
+    // Type sort drag (full 2D)
     let typeSortDragging = false;
     let typeSortIdx = -1;
     let typeSortClone = null;
+    let typeSortStartX = 0;
     let typeSortStartY = 0;
     let typeSortLongPress = null;
 
@@ -1916,9 +1920,10 @@
         typeSortClone.style.transform = 'scale(1.08)';
         typeSortClone.style.boxShadow = '0 4px 16px rgba(0,0,0,0.15)';
         typeSortClone.style.pointerEvents = 'none';
-        typeSortClone.style.transition = 'transform 0.12s, box-shadow 0.12s';
+        typeSortClone.style.transition = 'none';
         document.body.appendChild(typeSortClone);
-        origItem.style.opacity = '0.3';
+        origItem.style.opacity = '0.25';
+        typeSortStartX = touch.clientX;
         typeSortStartY = touch.clientY;
         if (navigator.vibrate) navigator.vibrate(20);
         document.addEventListener('touchmove', onTypeSortMove, { passive: false });
@@ -1929,27 +1934,28 @@
         if (!typeSortDragging || !typeSortClone) return;
         e.preventDefault();
         const touch = e.touches[0];
+        const dx = touch.clientX - typeSortStartX;
         const dy = touch.clientY - typeSortStartY;
-        typeSortClone.style.transform = 'scale(1.08) translateY(' + dy + 'px)';
-        // Check swap
+        const rect = typeSortClone.getBoundingClientRect();
+        typeSortClone.style.left = (rect.left + dx) + 'px';
+        typeSortClone.style.top = (rect.top + dy) + 'px';
+        typeSortStartX = touch.clientX;
+        typeSortStartY = touch.clientY;
+        // Check swap by overlap
         const items = Array.from(document.querySelectorAll('#tpl-type-selected .type-sort-item'));
         const cloneRect = typeSortClone.getBoundingClientRect();
-        const cloneCenterX = cloneRect.left + cloneRect.width / 2;
-        const cloneCenterY = cloneRect.top + cloneRect.height / 2;
+        const cloneCX = cloneRect.left + cloneRect.width / 2;
+        const cloneCY = cloneRect.top + cloneRect.height / 2;
         for (let i = 0; i < items.length; i++) {
             if (i === typeSortIdx) continue;
-            const rect = items[i].getBoundingClientRect();
-            if (cloneCenterX > rect.left && cloneCenterX < rect.right && cloneCenterY > rect.top && cloneCenterY < rect.bottom) {
-                if (i !== typeSortIdx) {
-                    const item = selectedTypes.splice(typeSortIdx, 1)[0];
-                    selectedTypes.splice(i, 0, item);
-                    typeSortIdx = i;
-                    renderTypePicker();
-                    // Re-dim
-                    const newItems = document.querySelectorAll('#tpl-type-selected .type-sort-item');
-                    if (newItems[typeSortIdx]) newItems[typeSortIdx].style.opacity = '0.3';
-                    typeSortStartY = touch.clientY;
-                }
+            const r = items[i].getBoundingClientRect();
+            if (cloneCX > r.left && cloneCX < r.right && cloneCY > r.top && cloneCY < r.bottom) {
+                const item = selectedTypes.splice(typeSortIdx, 1)[0];
+                selectedTypes.splice(i, 0, item);
+                typeSortIdx = i;
+                renderTypePicker();
+                const newItems = document.querySelectorAll('#tpl-type-selected .type-sort-item');
+                if (newItems[typeSortIdx]) newItems[typeSortIdx].style.opacity = '0.25';
                 break;
             }
         }
@@ -1958,14 +1964,26 @@
     function onTypeSortEnd(e) {
         if (!typeSortDragging) return;
         typeSortDragging = false;
-        typeSortIdx = -1;
         if (typeSortClone) {
-            typeSortClone.style.transition = 'transform 0.2s, opacity 0.2s';
-            typeSortClone.style.opacity = '0';
+            // Animate to target position
+            const targetItem = document.querySelectorAll('#tpl-type-selected .type-sort-item')[typeSortIdx];
+            if (targetItem) {
+                const targetRect = targetItem.getBoundingClientRect();
+                typeSortClone.style.transition = 'top 0.2s ease, left 0.2s ease, transform 0.2s ease, opacity 0.2s ease';
+                typeSortClone.style.left = targetRect.left + 'px';
+                typeSortClone.style.top = targetRect.top + 'px';
+                typeSortClone.style.transform = 'scale(1)';
+                typeSortClone.style.opacity = '0';
+            } else {
+                typeSortClone.style.transition = 'transform 0.2s, opacity 0.2s';
+                typeSortClone.style.transform = 'scale(1)';
+                typeSortClone.style.opacity = '0';
+            }
             const clone = typeSortClone;
             setTimeout(function() { if (clone.parentNode) clone.parentNode.removeChild(clone); }, 250);
             typeSortClone = null;
         }
+        typeSortIdx = -1;
         document.querySelectorAll('#tpl-type-selected .type-sort-item').forEach(function(el) { el.style.opacity = ''; });
         document.removeEventListener('touchmove', onTypeSortMove);
         document.removeEventListener('touchend', onTypeSortEnd);
@@ -3223,21 +3241,22 @@
     let bgImageData = localStorage.getItem('ck_bg_image') || '';
     let bgOpacity = parseInt(localStorage.getItem('ck_bg_opacity') || '20');
     let bgBlur = parseInt(localStorage.getItem('ck_bg_blur') || '0');
-    // Position/scale/rotation state (saved to localStorage)
-    let bgPosX = parseFloat(localStorage.getItem('ck_bg_pos_x') || '50');
-    let bgPosY = parseFloat(localStorage.getItem('ck_bg_pos_y') || '50');
+    // Transform state: position offset (px from center), scale, rotation
+    let bgOffX = parseFloat(localStorage.getItem('ck_bg_off_x') || '0');
+    let bgOffY = parseFloat(localStorage.getItem('ck_bg_off_y') || '0');
+    let bgScale = parseFloat(localStorage.getItem('ck_bg_scale') || '1');
     let bgRotation = parseFloat(localStorage.getItem('ck_bg_rotation') || '0');
-    let bgUserScale = parseFloat(localStorage.getItem('ck_bg_scale') || '1');
     let bgNaturalW = parseInt(localStorage.getItem('ck_bg_natural_w') || '0');
     let bgNaturalH = parseInt(localStorage.getItem('ck_bg_natural_h') || '0');
     // Preview dialog state
-    let bgPreviewImg = null;
     let bgPreviewNaturalW = 0;
     let bgPreviewNaturalH = 0;
-    let bgPreviewPosX = 50;
-    let bgPreviewPosY = 50;
-    let bgPreviewRotation = 0;
+    let bgPreviewOffX = 0;
+    let bgPreviewOffY = 0;
     let bgPreviewScale = 1;
+    let bgPreviewRotation = 0;
+    let bgPreviewContainerW = 0;
+    let bgPreviewContainerH = 0;
 
     function uploadBackground() {
         if (isAndroid && NativeBridge.pickImage) {
@@ -3266,17 +3285,15 @@
     };
 
     function showBgPositionDialog(dataUrl) {
-        bgPreviewPosX = 50;
-        bgPreviewPosY = 50;
-        bgPreviewRotation = 0;
+        bgPreviewOffX = 0;
+        bgPreviewOffY = 0;
         bgPreviewScale = 1;
+        bgPreviewRotation = 0;
         const img = document.getElementById('bg-preview-img');
         img.src = dataUrl;
         img.onload = function() {
-            bgPreviewImg = img;
             bgPreviewNaturalW = img.naturalWidth;
             bgPreviewNaturalH = img.naturalHeight;
-            // Preview container: show full image at photo's aspect ratio
             const viewW = document.documentElement.clientWidth || 360;
             const viewH = document.documentElement.clientHeight || 640;
             const maxW = Math.min(Math.round(viewW * 0.85), 340);
@@ -3290,13 +3307,11 @@
                 containerH = maxH;
                 containerW = Math.round(maxH * imgRatio);
             }
+            bgPreviewContainerW = containerW;
+            bgPreviewContainerH = containerH;
             const container = document.getElementById('bg-crop-container');
             container.style.width = containerW + 'px';
             container.style.height = containerH + 'px';
-            // Image fills container (show full photo)
-            img.style.width = containerW + 'px';
-            img.style.height = containerH + 'px';
-            img.style.objectFit = 'cover';
             // Dashed rect: device screen ratio centered in container
             const screenRatio = viewW / viewH;
             let rectW, rectH;
@@ -3314,43 +3329,40 @@
             rect.style.top = rectY + 'px';
             rect.style.width = rectW + 'px';
             rect.style.height = rectH + 'px';
-            // Store rect dimensions for gesture calculations
-            container._screenRect = { x: rectX, y: rectY, w: rectW, h: rectH };
-            container._containerW = containerW;
-            container._containerH = containerH;
-            // Setup gestures
-            setupBgPositionGestures(containerW, containerH);
+            updateBgPreview();
+            setupBgPositionGestures();
             showDialog('bg-crop-dialog');
         };
     }
 
-    function updateBgPreview(containerW, containerH) {
+    function updateBgPreview() {
         const img = document.getElementById('bg-preview-img');
-        if (!img || !bgPreviewImg) return;
-        // Image fills container with scale
+        if (!img || !bgPreviewNaturalW) return;
+        const cW = bgPreviewContainerW;
+        const cH = bgPreviewContainerH;
         const scale = bgPreviewScale;
-        img.style.width = (containerW * scale) + 'px';
-        img.style.height = (containerH * scale) + 'px';
+        // Image size: cover the container * scale
+        img.style.width = (cW * scale) + 'px';
+        img.style.height = (cH * scale) + 'px';
         img.style.objectFit = 'cover';
-        // Position offset from center
-        const offsetX = (containerW - containerW * scale) / 2 + (bgPreviewPosX - 50) * containerW * scale / 100;
-        const offsetY = (containerH - containerH * scale) / 2 + (bgPreviewPosY - 50) * containerH * scale / 100;
-        img.style.marginLeft = offsetX + 'px';
-        img.style.marginTop = offsetY + 'px';
+        // Position: center + offset
+        const left = (cW - cW * scale) / 2 + bgPreviewOffX;
+        const top = (cH - cH * scale) / 2 + bgPreviewOffY;
+        img.style.position = 'absolute';
+        img.style.left = left + 'px';
+        img.style.top = top + 'px';
         img.style.transform = 'rotate(' + bgPreviewRotation + 'deg)';
         img.style.transformOrigin = 'center center';
     }
 
-    function setupBgPositionGestures(containerW, containerH) {
+    function setupBgPositionGestures() {
         const container = document.getElementById('bg-crop-container');
         let dragging = false;
         let startX = 0, startY = 0;
-        let startPosX = 50, startPosY = 50;
-        // Pinch state
+        let startOffX = 0, startOffY = 0;
         let pinching = false;
         let lastPinchDist = 0;
         let startScale = 1;
-        // Rotation state
         let lastAngle = 0;
         let startRotation = 0;
 
@@ -3370,8 +3382,8 @@
                 dragging = true;
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
-                startPosX = bgPreviewPosX;
-                startPosY = bgPreviewPosY;
+                startOffX = bgPreviewOffX;
+                startOffY = bgPreviewOffY;
             }
         };
         container.ontouchmove = function(e) {
@@ -3380,19 +3392,16 @@
                 const dx = e.touches[1].clientX - e.touches[0].clientX;
                 const dy = e.touches[1].clientY - e.touches[0].clientY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                const ratio = dist / lastPinchDist;
-                bgPreviewScale = Math.max(1, Math.min(startScale * ratio, 5));
+                bgPreviewScale = Math.max(1, Math.min(startScale * (dist / lastPinchDist), 5));
                 const angle = Math.atan2(dy, dx) * 180 / Math.PI;
                 bgPreviewRotation = startRotation + (angle - lastAngle);
-                updateBgPreview(containerW, containerH);
+                updateBgPreview();
             } else if (dragging && e.touches.length === 1) {
                 const dx = e.touches[0].clientX - startX;
                 const dy = e.touches[0].clientY - startY;
-                bgPreviewPosX = startPosX + (dx / containerW) * 100 / bgPreviewScale;
-                bgPreviewPosY = startPosY + (dy / containerH) * 100 / bgPreviewScale;
-                bgPreviewPosX = Math.max(-50, Math.min(150, bgPreviewPosX));
-                bgPreviewPosY = Math.max(-50, Math.min(150, bgPreviewPosY));
-                updateBgPreview(containerW, containerH);
+                bgPreviewOffX = startOffX + dx;
+                bgPreviewOffY = startOffY + dy;
+                updateBgPreview();
             }
         };
         container.ontouchend = function(e) {
@@ -3403,10 +3412,10 @@
 
     function applyBgPosition() {
         bgImageData = document.getElementById('bg-preview-img').src;
-        bgPosX = bgPreviewPosX;
-        bgPosY = bgPreviewPosY;
+        bgOffX = bgPreviewOffX;
+        bgOffY = bgPreviewOffY;
+        bgScale = bgPreviewScale;
         bgRotation = bgPreviewRotation;
-        bgUserScale = bgPreviewScale;
         bgNaturalW = bgPreviewNaturalW;
         bgNaturalH = bgPreviewNaturalH;
         try {
@@ -3414,10 +3423,10 @@
         } catch(e) {
             showToast('背景图片过大，无法保存', 'warning');
         }
-        localStorage.setItem('ck_bg_pos_x', String(bgPosX));
-        localStorage.setItem('ck_bg_pos_y', String(bgPosY));
+        localStorage.setItem('ck_bg_off_x', String(bgOffX));
+        localStorage.setItem('ck_bg_off_y', String(bgOffY));
+        localStorage.setItem('ck_bg_scale', String(bgScale));
         localStorage.setItem('ck_bg_rotation', String(bgRotation));
-        localStorage.setItem('ck_bg_scale', String(bgUserScale));
         localStorage.setItem('ck_bg_natural_w', String(bgNaturalW));
         localStorage.setItem('ck_bg_natural_h', String(bgNaturalH));
         localStorage.setItem('ck_bg_opacity', String(bgOpacity));
@@ -3434,17 +3443,17 @@
 
     function removeBackground() {
         bgImageData = '';
-        bgPosX = 50;
-        bgPosY = 50;
+        bgOffX = 0;
+        bgOffY = 0;
+        bgScale = 1;
         bgRotation = 0;
-        bgUserScale = 1;
         bgNaturalW = 0;
         bgNaturalH = 0;
         localStorage.removeItem('ck_bg_image');
-        localStorage.removeItem('ck_bg_pos_x');
-        localStorage.removeItem('ck_bg_pos_y');
-        localStorage.removeItem('ck_bg_rotation');
+        localStorage.removeItem('ck_bg_off_x');
+        localStorage.removeItem('ck_bg_off_y');
         localStorage.removeItem('ck_bg_scale');
+        localStorage.removeItem('ck_bg_rotation');
         localStorage.removeItem('ck_bg_natural_w');
         localStorage.removeItem('ck_bg_natural_h');
         applyCustomBackground();
@@ -3478,23 +3487,23 @@
 
     function applyCustomBackground() {
         const layer = document.getElementById('custom-bg-layer');
+        const img = document.getElementById('custom-bg-img');
         const root = document.documentElement;
         if (!bgImageData) {
             layer.style.display = 'none';
-            layer.style.backgroundImage = '';
-            layer.style.transform = '';
+            img.src = '';
+            img.style.transform = '';
             root.style.removeProperty('--custom-screen-bg');
             root.style.removeProperty('--custom-surface-bg');
             root.style.removeProperty('--custom-nav-bg');
             return;
         }
         layer.style.display = 'block';
-        const blurPx = Math.round(bgBlur * 0.2);
-        layer.style.backgroundImage = 'url(' + bgImageData + ')';
-        // Calculate cover size with user scale multiplier
+        img.src = bgImageData;
+        // Calculate cover dimensions for the viewport
         const layerW = window.innerWidth;
         const layerH = window.innerHeight;
-        const scale = bgUserScale || 1;
+        const scale = bgScale || 1;
         if (bgNaturalW && bgNaturalH) {
             const imgRatio = bgNaturalW / bgNaturalH;
             const layerRatio = layerW / layerH;
@@ -3506,21 +3515,31 @@
                 coverW = layerW;
                 coverH = layerW / imgRatio;
             }
-            layer.style.backgroundSize = (coverW * scale) + 'px ' + (coverH * scale) + 'px';
+            img.style.width = (coverW * scale) + 'px';
+            img.style.height = (coverH * scale) + 'px';
         } else {
-            // Fallback if dimensions not stored
-            layer.style.backgroundSize = scale > 1 ? (scale * 100) + '%' : 'cover';
+            img.style.width = (layerW * scale) + 'px';
+            img.style.height = (layerH * scale) + 'px';
+            img.style.objectFit = 'cover';
         }
-        layer.style.backgroundPosition = bgPosX + '% ' + bgPosY + '%';
-        layer.style.opacity = '1';
+        // Position: center + offset (scale offset from preview to screen)
+        const previewToScreenX = layerW / (bgPreviewContainerW || layerW);
+        const previewToScreenY = layerH / (bgPreviewContainerH || layerH);
+        const left = (layerW - img.offsetWidth) / 2 + bgOffX * (layerW / 340);
+        const top = (layerH - img.offsetHeight) / 2 + bgOffY * (layerH / 400);
+        img.style.left = left + 'px';
+        img.style.top = top + 'px';
+        // Blur
+        const blurPx = Math.round(bgBlur * 0.2);
         layer.style.filter = 'blur(' + blurPx + 'px)';
-        // Apply rotation
+        // Rotation
         if (bgRotation && bgRotation !== 0) {
-            layer.style.transform = 'rotate(' + bgRotation + 'deg)';
+            img.style.transform = 'rotate(' + bgRotation + 'deg)';
+            img.style.transformOrigin = 'center center';
         } else {
-            layer.style.transform = '';
+            img.style.transform = '';
         }
-        // Apply alpha to all UI layers via CSS variables
+        // Apply alpha to UI layers
         const alpha = Math.max(0.1, 1 - bgOpacity / 100);
         const isDark = root.getAttribute('data-theme') === 'dark';
         const bgR = isDark ? 26 : 240;
