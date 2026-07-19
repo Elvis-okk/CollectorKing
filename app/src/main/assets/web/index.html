@@ -52,9 +52,9 @@
         .screen { display: none; flex-direction: column; background: var(--custom-screen-bg, var(--bg)); min-height: 100vh; min-height: 100dvh; padding-bottom: 30px; position: relative; z-index: 1; }
         .screen.active { display: flex; }
         .screen::-webkit-scrollbar { width: 0; }
-        .bottom-nav { background: var(--custom-surface-bg, var(--surface)); border-top: 1px solid var(--border); display: flex; padding: 8px 0 8px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; padding-bottom: calc(8px + env(safe-area-inset-bottom)); box-shadow: 0 -1px 6px rgba(0,0,0,0.04); }
-        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 8px 0; cursor: pointer; transition: all 0.2s; position: relative; border: none; background: none; }
-        .nav-item i { width: 45px; height: 45px; color: var(--text-3); transition: all 0.2s; }
+        .bottom-nav { background: var(--custom-nav-bg, var(--custom-surface-bg, var(--surface))); border-top: 1px solid var(--border); display: flex; padding: 5px 0 5px; position: fixed; bottom: 0; left: 0; right: 0; z-index: 20; padding-bottom: calc(5px + env(safe-area-inset-bottom)); box-shadow: 0 -1px 6px rgba(0,0,0,0.04); }
+        .nav-item { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 1px; padding: 5px 0; cursor: pointer; transition: all 0.2s; position: relative; border: none; background: none; }
+        .nav-item i { width: 50px; height: 50px; color: var(--text-3); transition: all 0.2s; }
         .nav-item.active i { color: var(--primary); }
         .nav-item.active::before { content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 24px; height: 2px; background: var(--primary); border-radius: 0 0 2px 2px; }
         .card { background: var(--custom-surface-bg, var(--surface)); border-radius: 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.06); overflow: hidden; }
@@ -237,113 +237,24 @@
                 <div style="font-size:22px;font-weight:800;color:var(--text-1);">设置</div>
             </div>
             <div style="flex:1;overflow-y:auto;padding:16px 20px 24px;">
-                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">照片处理</div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">设置项</div>
                 <div class="card" style="margin-bottom:20px;">
-                    <div style="padding:16px;">
-                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
-                            <div style="display:flex;align-items:center;gap:10px;">
-                                <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="minimize-2" style="width:18px;height:18px;color:var(--primary);"></i></div>
-                                <span style="font-size:15px;font-weight:500;">压缩质量</span>
-                            </div>
-                            <span style="font-size:16px;font-weight:700;color:var(--primary);" id="q-val">70%</span>
+                    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="switchTab('settings-photo')">
+                        <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="minimize-2" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:600;color:var(--text-1);">照片处理</div>
+                            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">压缩质量、命名方式、打包归类</div>
                         </div>
-                        <input type="range" min="10" max="100" value="70" step="1" id="quality-slider" style="width:100%;accent-color:var(--primary);" oninput="document.getElementById('q-val').textContent=this.value+'%';localStorage.setItem('ck_quality',this.value);if(typeof NativeBridge!=='undefined'&&NativeBridge.setCompressQuality){NativeBridge.setCompressQuality(parseInt(this.value))}">
-                        <div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="font-size:11px;color:var(--text-3);">低质量 · 小文件</span><span style="font-size:11px;color:var(--text-3);">高质量 · 大文件</span></div>
+                        <i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-3);"></i>
                     </div>
                     <div style="height:1px;background:var(--border);margin:0 16px;"></div>
-                    <div style="padding:16px 16px 12px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--success-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="file-text" style="width:18px;height:18px;color:var(--success);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">照片命名方式</span>
+                    <div style="padding:14px 16px;display:flex;align-items:center;gap:12px;cursor:pointer;" onclick="switchTab('settings-appearance')">
+                        <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="palette" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                        <div style="flex:1;">
+                            <div style="font-size:14px;font-weight:600;color:var(--text-1);">外观</div>
+                            <div style="font-size:12px;color:var(--text-3);margin-top:2px;">主题颜色、深色模式、自定义背景</div>
                         </div>
-                        <div style="display:flex;gap:8px;">
-                            <button id="naming-type-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('type')">按证件类型</button>
-                            <button id="naming-order-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('order')">按拍摄顺序</button>
-                        </div>
-                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="naming-hint">照片按「证件类型名_序号」命名，如：身份证_01.jpg</div>
-                    </div>
-                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
-                    <div style="padding:16px 16px 12px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="folder" style="width:18px;height:18px;color:var(--warning);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">打包归类方式</span>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button id="pack-flat-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('flat')">不分类打包</button>
-                            <button id="pack-folder-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('folder')">按类型分文件夹</button>
-                        </div>
-                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="pack-hint">所有照片不分类，直接放在ZIP根目录</div>
-                    </div>
-                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
-                    <div style="padding:16px 16px 12px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--error-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="clock" style="width:18px;height:18px;color:var(--error);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">压缩包命名</span>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button id="ts-off-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('off')">不带时间戳</button>
-                            <button id="ts-on-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('on')">带时间戳</button>
-                        </div>
-                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="ts-hint">压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）</div>
-                    </div>
-                </div>
-                <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">外观</div>
-                <div class="card" style="margin-bottom:20px;">
-                    <div style="padding:16px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="palette" style="width:18px;height:18px;color:var(--primary);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">主题颜色</span>
-                        </div>
-                        <div style="display:flex;gap:10px;flex-wrap:wrap;" id="theme-color-picker">
-                            <div class="theme-color-item selected" data-color="blue" onclick="setThemeColor('blue')" style="width:32px;height:32px;border-radius:50%;background:#4F8EFF;cursor:pointer;border:2px solid var(--primary);box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="green" onclick="setThemeColor('green')" style="width:32px;height:32px;border-radius:50%;background:#10B981;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="purple" onclick="setThemeColor('purple')" style="width:32px;height:32px;border-radius:50%;background:#8B5CF6;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="orange" onclick="setThemeColor('orange')" style="width:32px;height:32px;border-radius:50%;background:#F97316;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="teal" onclick="setThemeColor('teal')" style="width:32px;height:32px;border-radius:50%;background:#06B6D4;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="pink" onclick="setThemeColor('pink')" style="width:32px;height:32px;border-radius:50%;background:#EC4899;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="gray" onclick="setThemeColor('gray')" style="width:32px;height:32px;border-radius:50%;background:#6B7280;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                            <div class="theme-color-item" data-color="mono" onclick="setThemeColor('mono')" style="width:32px;height:32px;border-radius:50%;background:#374151;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
-                        </div>
-                    </div>
-                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
-                    <div style="padding:16px 16px 12px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--surface-dim);display:flex;align-items:center;justify-content:center;"><i data-lucide="moon" style="width:18px;height:18px;color:var(--text-2);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">深色模式</span>
-                        </div>
-                        <div style="display:flex;gap:8px;">
-                            <button id="dark-off-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('off')">浅色</button>
-                            <button id="dark-on-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('on')">深色</button>
-                            <button id="dark-auto-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('auto')">跟随系统</button>
-                        </div>
-                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="dark-hint">使用浅色模式</div>
-                    </div>
-                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
-                    <div style="padding:16px 16px 12px;">
-                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-                            <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="image" style="width:18px;height:18px;color:var(--primary);"></i></div>
-                            <span style="font-size:15px;font-weight:500;">自定义背景</span>
-                        </div>
-                        <div style="display:flex;gap:8px;margin-bottom:10px;">
-                            <button id="bg-upload-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="uploadBackground()">上传图片</button>
-                            <button id="bg-remove-btn" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="removeBackground()">移除背景</button>
-                        </div>
-                        <div id="bg-controls" style="display:none;">
-                            <div style="margin-bottom:8px;">
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                    <span style="font-size:12px;color:var(--text-2);">透明度</span>
-                                    <span style="font-size:12px;color:var(--primary);" id="bg-opacity-val">20%</span>
-                                </div>
-                                <input type="range" id="bg-opacity-slider" min="0" max="100" value="20" style="width:100%;accent-color:var(--primary);" oninput="updateBgOpacity(this.value)">
-                            </div>
-                            <div>
-                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
-                                    <span style="font-size:12px;color:var(--text-2);">模糊度</span>
-                                    <span style="font-size:12px;color:var(--primary);" id="bg-blur-val">0%</span>
-                                </div>
-                                <input type="range" id="bg-blur-slider" min="0" max="100" value="0" style="width:100%;accent-color:var(--primary);" oninput="updateBgBlur(this.value)">
-                            </div>
-                        </div>
+                        <i data-lucide="chevron-right" style="width:18px;height:18px;color:var(--text-3);"></i>
                     </div>
                 </div>
                 <div style="font-size:13px;font-weight:600;color:var(--text-2);margin-bottom:8px;padding-left:4px;">证件类型管理</div>
@@ -458,6 +369,137 @@
                             <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.2.0</b> 新增照片命名方式与打包归类设置；修复历史记录照片丢失问题；优化对话框样式</div>
                             <div style="margin-bottom:6px;"><b style="color:var(--text-1);">1.1.0</b> 全面屏适配；暂存功能优化；新增自定义图标</div>
                             <div><b style="color:var(--text-1);">1.0.0</b> 新增照片压缩功能；新增模板的导入导出；新增自定义证件类型</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SETTINGS: PHOTO PROCESSING PAGE ===== -->
+        <div class="screen" id="tab-settings-photo">
+            <div class="screen-header" style="padding:1px 20px 12px;padding-top:calc(1px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="switchTab('settings')"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;"><div style="font-size:18px;font-weight:700;color:var(--text-1);">照片处理</div></div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 20px 24px;">
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                            <div style="display:flex;align-items:center;gap:10px;">
+                                <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="minimize-2" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                                <span style="font-size:15px;font-weight:500;">压缩质量</span>
+                            </div>
+                            <span style="font-size:16px;font-weight:700;color:var(--primary);" id="q-val2">70%</span>
+                        </div>
+                        <input type="range" min="10" max="100" value="70" step="1" id="quality-slider2" style="width:100%;accent-color:var(--primary);" oninput="document.getElementById('q-val2').textContent=this.value+'%';document.getElementById('q-val').textContent=this.value+'%';document.getElementById('quality-slider').value=this.value;localStorage.setItem('ck_quality',this.value);if(typeof NativeBridge!=='undefined'&&NativeBridge.setCompressQuality){NativeBridge.setCompressQuality(parseInt(this.value))}">
+                        <div style="display:flex;justify-content:space-between;margin-top:6px;"><span style="font-size:11px;color:var(--text-3);">低质量 · 小文件</span><span style="font-size:11px;color:var(--text-3);">高质量 · 大文件</span></div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--success-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="file-text" style="width:18px;height:18px;color:var(--success);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">照片命名方式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="naming-type-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('type')">按证件类型</button>
+                            <button id="naming-order-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setNamingMode('order')">按拍摄顺序</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="naming-hint2">照片按「证件类型名_序号」命名，如：身份证_01.jpg</div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--warning-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="folder" style="width:18px;height:18px;color:var(--warning);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">打包归类方式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="pack-flat-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('flat')">不分类打包</button>
+                            <button id="pack-folder-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setPackMode('folder')">按类型分文件夹</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="pack-hint2">所有照片不分类，直接放在ZIP根目录</div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--error-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="clock" style="width:18px;height:18px;color:var(--error);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">压缩包命名</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="ts-off-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('off')">不带时间戳</button>
+                            <button id="ts-on-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setTimestampMode('on')">带时间戳</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="ts-hint2">压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== SETTINGS: APPEARANCE PAGE ===== -->
+        <div class="screen" id="tab-settings-appearance">
+            <div class="screen-header" style="padding:1px 20px 12px;padding-top:calc(1px + env(safe-area-inset-top));flex-shrink:0;">
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <button style="width:36px;height:36px;border-radius:50%;background:var(--surface-dim);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="switchTab('settings')"><i data-lucide="arrow-left" style="width:18px;height:18px;color:var(--text-1);"></i></button>
+                    <div style="flex:1;"><div style="font-size:18px;font-weight:700;color:var(--text-1);">外观</div></div>
+                </div>
+            </div>
+            <div style="flex:1;overflow-y:auto;padding:16px 20px 24px;">
+                <div class="card" style="margin-bottom:20px;">
+                    <div style="padding:16px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="palette" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">主题颜色</span>
+                        </div>
+                        <div style="display:flex;gap:10px;flex-wrap:wrap;" id="theme-color-picker2">
+                            <div class="theme-color-item" data-color="blue" onclick="setThemeColor('blue')" style="width:32px;height:32px;border-radius:50%;background:#4F8EFF;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="green" onclick="setThemeColor('green')" style="width:32px;height:32px;border-radius:50%;background:#10B981;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="purple" onclick="setThemeColor('purple')" style="width:32px;height:32px;border-radius:50%;background:#8B5CF6;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="orange" onclick="setThemeColor('orange')" style="width:32px;height:32px;border-radius:50%;background:#F97316;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="teal" onclick="setThemeColor('teal')" style="width:32px;height:32px;border-radius:50%;background:#06B6D4;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="pink" onclick="setThemeColor('pink')" style="width:32px;height:32px;border-radius:50%;background:#EC4899;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="gray" onclick="setThemeColor('gray')" style="width:32px;height:32px;border-radius:50%;background:#6B7280;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                            <div class="theme-color-item" data-color="mono" onclick="setThemeColor('mono')" style="width:32px;height:32px;border-radius:50%;background:#374151;cursor:pointer;border:2px solid transparent;box-shadow:0 0 0 1.5px white;transition:all 0.15s;"></div>
+                        </div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--surface-dim);display:flex;align-items:center;justify-content:center;"><i data-lucide="moon" style="width:18px;height:18px;color:var(--text-2);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">深色模式</span>
+                        </div>
+                        <div style="display:flex;gap:8px;">
+                            <button id="dark-off-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('off')">浅色</button>
+                            <button id="dark-on-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('on')">深色</button>
+                            <button id="dark-auto-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="setDarkMode('auto')">跟随系统</button>
+                        </div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:6px;" id="dark-hint2">使用浅色模式</div>
+                    </div>
+                    <div style="height:1px;background:var(--border);margin:0 16px;"></div>
+                    <div style="padding:16px 16px 12px;">
+                        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+                            <div style="width:36px;height:36px;border-radius:10px;background:var(--primary-light);display:flex;align-items:center;justify-content:center;"><i data-lucide="image" style="width:18px;height:18px;color:var(--primary);"></i></div>
+                            <span style="font-size:15px;font-weight:500;">自定义背景</span>
+                        </div>
+                        <div style="display:flex;gap:8px;margin-bottom:10px;">
+                            <button id="bg-upload-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--primary);background:var(--primary-light);color:var(--primary);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="uploadBackground()">上传图片</button>
+                            <button id="bg-remove-btn2" style="flex:1;padding:10px;border-radius:10px;border:2px solid var(--border);background:var(--surface);color:var(--text-2);font-size:13px;font-weight:600;cursor:pointer;transition:all 0.15s;" onclick="removeBackground()">移除背景</button>
+                        </div>
+                        <div id="bg-controls2" style="display:none;">
+                            <div style="margin-bottom:8px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                    <span style="font-size:12px;color:var(--text-2);">透明度</span>
+                                    <span style="font-size:12px;color:var(--primary);" id="bg-opacity-val2">20%</span>
+                                </div>
+                                <input type="range" id="bg-opacity-slider2" min="0" max="100" value="20" style="width:100%;accent-color:var(--primary);" oninput="updateBgOpacity(this.value)">
+                            </div>
+                            <div>
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+                                    <span style="font-size:12px;color:var(--text-2);">模糊度</span>
+                                    <span style="font-size:12px;color:var(--primary);" id="bg-blur-val2">0%</span>
+                                </div>
+                                <input type="range" id="bg-blur-slider2" min="0" max="100" value="0" style="width:100%;accent-color:var(--primary);" oninput="updateBgBlur(this.value)">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -758,19 +800,20 @@
             </div>
         </div>
 
-        <!-- ===== DIALOG: Background Crop ===== -->
-        <div class="overlay center" id="bg-crop-dialog" onclick="if(event.target===this)hideDialog('bg-crop-dialog')">
-            <div class="dialog" style="max-width:340px;">
-                <h3>裁切背景图片</h3>
-                <div style="position:relative;width:100%;margin:12px 0;overflow:hidden;border-radius:10px;background:var(--surface-dim);">
-                    <div id="bg-crop-container" style="position:relative;width:100%;overflow:hidden;border-radius:10px;background:#000;">
-                    <canvas id="bg-crop-canvas" style="display:block;width:100%;"></canvas>
+        <!-- ===== DIALOG: Background Position ===== -->
+        <div class="overlay center" id="bg-crop-dialog" onclick="if(event.target===this)cancelBgPosition()">
+            <div class="dialog" style="max-width:360px;">
+                <h3>调整背景图片</h3>
+                <div style="position:relative;width:100%;margin:12px 0;overflow:hidden;border-radius:10px;background:#000;">
+                    <div id="bg-crop-container" style="position:relative;width:100%;overflow:hidden;border-radius:10px;background:#000;touch-action:none;">
+                        <img id="bg-preview-img" style="display:block;width:100%;object-fit:cover;user-select:none;-webkit-user-drag:none;" src="" alt="">
+                        <div id="bg-screen-rect" style="position:absolute;border:2px dashed rgba(255,255,255,0.7);pointer-events:none;box-sizing:border-box;"></div>
+                    </div>
                 </div>
-                </div>
-                <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;">9:20比例裁切，拖动调整位置，双指缩放</div>
+                <div style="font-size:12px;color:var(--text-3);text-align:center;margin-bottom:8px;">拖动定位 · 双指缩放旋转 · 虚线框为屏幕比例</div>
                 <div class="dialog-actions">
-                    <button class="btn-outlined" style="flex:1;" onclick="hideDialog('bg-crop-dialog')">取消</button>
-                    <button class="btn-primary" style="flex:1;" onclick="applyBgCrop()">应用</button>
+                    <button class="btn-outlined" style="flex:1;" onclick="cancelBgPosition()">取消</button>
+                    <button class="btn-primary" style="flex:1;" onclick="applyBgPosition()">应用</button>
                 </div>
             </div>
         </div>
@@ -1590,28 +1633,144 @@
             lucide.createIcons();
             return;
         }
-        container.innerHTML = templates.map(t => `
-            <div class="card" style="margin-bottom:12px;">
-                <div style="display:flex;align-items:center;">
-                    <div class="template-item" style="flex:1;min-width:0;" onclick="startCollection('${t.id}')">
-                        <div style="width:48px;height:48px;border-radius:14px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-                            <i data-lucide="${t.icon}" style="width:24px;height:24px;color:${t.iconColor};"></i>
-                        </div>
-                        <div style="flex:1;min-width:0;">
-                            <div style="font-size:16px;font-weight:600;color:var(--text-1);">${t.name}</div>
-                            <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
-                            <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
-                        </div>
+        container.innerHTML = templates.map((t, idx) => `
+            <div class="card" style="margin-bottom:12px;" data-tpl-id="${t.id}" data-tpl-idx="${idx}">
+                <div class="template-item" onclick="startCollection('${t.id}')" ontouchstart="onTplItemTouchStart(event,'${t.id}')" ontouchend="onTplItemTouchEnd(event,'${t.id}')">
+                    <div style="width:48px;height:48px;border-radius:14px;background:${t.iconBg};display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative;">
+                        <i data-lucide="${t.icon}" style="width:24px;height:24px;color:${t.iconColor};"></i>
                     </div>
-                    <div style="display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-left:1px solid var(--border);flex-shrink:0;">
-                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();editTemplate('${t.id}')"><i data-lucide="pencil" style="width:15px;height:15px;color:var(--primary);"></i></button>
-                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();exportTemplate('${t.id}')"><i data-lucide="share-2" style="width:15px;height:15px;color:var(--success);"></i></button>
-                        <button style="width:36px;height:36px;border-radius:8px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;" onclick="event.stopPropagation();deleteTemplate('${t.id}')"><i data-lucide="trash-2" style="width:15px;height:15px;color:var(--error);"></i></button>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:16px;font-weight:600;color:var(--text-1);">${t.name}</div>
+                        <div style="font-size:12px;color:var(--text-2);margin-top:2px;">${t.desc || ''}</div>
+                        <div style="font-size:11px;color:var(--text-3);margin-top:4px;">${t.types.length}种证件</div>
                     </div>
+                    <i data-lucide="grip-vertical" style="width:18px;height:18px;color:var(--text-3);flex-shrink:0;opacity:0.4;"></i>
+                </div>
+                <div style="display:flex;border-top:1px solid var(--border);">
+                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--primary);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="event.stopPropagation();editTemplate('${t.id}')"><i data-lucide="pencil" style="width:14px;height:14px;"></i> 编辑</button>
+                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--success);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;border-right:1px solid var(--border);" onclick="event.stopPropagation();exportTemplate('${t.id}')"><i data-lucide="share-2" style="width:14px;height:14px;"></i> 分享</button>
+                    <button style="flex:1;padding:10px 0;border:none;background:none;cursor:pointer;font-size:13px;color:var(--error);font-weight:600;display:flex;align-items:center;justify-content:center;gap:4px;" onclick="event.stopPropagation();deleteTemplate('${t.id}')"><i data-lucide="trash-2" style="width:14px;height:14px;"></i> 删除</button>
                 </div>
             </div>
         `).join('');
         lucide.createIcons();
+    }
+
+    // Long-press & drag sort for template cards
+    let tplLongPressTimer = null;
+    let tplLongPressId = null;
+    let tplDragging = false;
+    let tplDragIdx = -1;
+    let tplDragStartY = 0;
+    let tplDragOffsetY = 0;
+    let tplDragEl = null;
+
+    function onTplItemTouchStart(e, id) {
+        tplLongPressId = id;
+        tplLongPressTimer = setTimeout(function() {
+            tplLongPressTimer = null;
+            startTplDrag(id);
+        }, 500);
+    }
+
+    function onTplItemTouchEnd(e, id) {
+        if (tplLongPressTimer) {
+            clearTimeout(tplLongPressTimer);
+            tplLongPressTimer = null;
+        }
+        if (tplDragging && tplLongPressId === id) {
+            endTplDrag();
+        }
+    }
+
+    function startTplDrag(id) {
+        const idx = templates.findIndex(t => t.id === id);
+        if (idx < 0) return;
+        tplDragging = true;
+        tplDragIdx = idx;
+        const cards = document.querySelectorAll('#template-list .card');
+        cards.forEach(function(card, i) {
+            if (i === idx) {
+                tplDragEl = card;
+                card.style.opacity = '0.6';
+                card.style.transform = 'scale(1.03)';
+                card.style.zIndex = '10';
+                card.style.transition = 'transform 0.15s, opacity 0.15s';
+            } else {
+                card.style.transition = 'transform 0.2s';
+            }
+        });
+        showToast('拖动排序中，松手完成', 'info');
+        document.addEventListener('touchmove', onTplDragMove, { passive: false });
+        document.addEventListener('touchend', onTplDragEnd);
+    }
+
+    function onTplDragMove(e) {
+        if (!tplDragging) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const cards = Array.from(document.querySelectorAll('#template-list .card'));
+        const dragCard = cards[tplDragIdx];
+        if (!dragCard) return;
+        const dragRect = dragCard.getBoundingClientRect();
+        const centerY = touch.clientY;
+        for (let i = 0; i < cards.length; i++) {
+            if (i === tplDragIdx) continue;
+            const rect = cards[i].getBoundingClientRect();
+            const cardMid = rect.top + rect.height / 2;
+            if (centerY < cardMid && i < tplDragIdx) {
+                // Move up: swap template order
+                const item = templates.splice(tplDragIdx, 1)[0];
+                templates.splice(i, 0, item);
+                tplDragIdx = i;
+                saveTemplates();
+                renderTemplateList();
+                // Re-apply drag style to new position
+                const newCards = document.querySelectorAll('#template-list .card');
+                if (newCards[tplDragIdx]) {
+                    tplDragEl = newCards[tplDragIdx];
+                    newCards[tplDragIdx].style.opacity = '0.6';
+                    newCards[tplDragIdx].style.transform = 'scale(1.03)';
+                    newCards[tplDragIdx].style.zIndex = '10';
+                }
+                break;
+            } else if (centerY > cardMid && i > tplDragIdx) {
+                // Move down: swap template order
+                const item = templates.splice(tplDragIdx, 1)[0];
+                templates.splice(i, 0, item);
+                tplDragIdx = i;
+                saveTemplates();
+                renderTemplateList();
+                const newCards = document.querySelectorAll('#template-list .card');
+                if (newCards[tplDragIdx]) {
+                    tplDragEl = newCards[tplDragIdx];
+                    newCards[tplDragIdx].style.opacity = '0.6';
+                    newCards[tplDragIdx].style.transform = 'scale(1.03)';
+                    newCards[tplDragIdx].style.zIndex = '10';
+                }
+                break;
+            }
+        }
+    }
+
+    function onTplDragEnd(e) {
+        endTplDrag();
+    }
+
+    function endTplDrag() {
+        tplDragging = false;
+        tplDragIdx = -1;
+        if (tplDragEl) {
+            tplDragEl.style.opacity = '';
+            tplDragEl.style.transform = '';
+            tplDragEl.style.zIndex = '';
+            tplDragEl = null;
+        }
+        document.removeEventListener('touchmove', onTplDragMove);
+        document.removeEventListener('touchend', onTplDragEnd);
+        // Sync home page
+        renderHomeList();
+        saveTemplates();
     }
 
     function showNewTemplateDialog() {
@@ -2607,46 +2766,61 @@
         updateTimestampUI();
     }
     function updateTimestampUI() {
-        const offBtn = document.getElementById('ts-off-btn');
-        const onBtn = document.getElementById('ts-on-btn');
-        const hint = document.getElementById('ts-hint');
-        if (timestampMode === 'on') {
-            onBtn.style.borderColor = 'var(--primary)'; onBtn.style.background = 'var(--primary-light)'; onBtn.style.color = 'var(--primary)';
-            offBtn.style.borderColor = 'var(--border)'; offBtn.style.background = 'var(--surface)'; offBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '压缩包名称带时间戳，如：证件收集_20260718_175825.zip';
-        } else {
-            offBtn.style.borderColor = 'var(--primary)'; offBtn.style.background = 'var(--primary-light)'; offBtn.style.color = 'var(--primary)';
-            onBtn.style.borderColor = 'var(--border)'; onBtn.style.background = 'var(--surface)'; onBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）';
-        }
+        ['ts-off-btn','ts-off-btn2'].forEach(function(id) {
+            const offBtn = document.getElementById(id);
+            if (!offBtn) return;
+            const onBtnId = id.replace('off','on');
+            const onBtn = document.getElementById(onBtnId);
+            const hintId = id.replace('ts-off-btn','ts-hint');
+            const hint = document.getElementById(hintId);
+            if (timestampMode === 'on') {
+                onBtn.style.borderColor = 'var(--primary)'; onBtn.style.background = 'var(--primary-light)'; onBtn.style.color = 'var(--primary)';
+                offBtn.style.borderColor = 'var(--border)'; offBtn.style.background = 'var(--surface)'; offBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '压缩包名称带时间戳，如：证件收集_20260718_175825.zip';
+            } else {
+                offBtn.style.borderColor = 'var(--primary)'; offBtn.style.background = 'var(--primary-light)'; offBtn.style.color = 'var(--primary)';
+                onBtn.style.borderColor = 'var(--border)'; onBtn.style.background = 'var(--surface)'; onBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '压缩包名称不带时间戳，如：证件收集.zip（同名自动加时间戳）';
+            }
+        });
     }
     function updateNamingUI() {
-        const typeBtn = document.getElementById('naming-type-btn');
-        const orderBtn = document.getElementById('naming-order-btn');
-        const hint = document.getElementById('naming-hint');
-        if (namingMode === 'type') {
-            typeBtn.style.borderColor = 'var(--primary)'; typeBtn.style.background = 'var(--primary-light)'; typeBtn.style.color = 'var(--primary)';
-            orderBtn.style.borderColor = 'var(--border)'; orderBtn.style.background = 'var(--surface)'; orderBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '照片按「证件类型名_序号」命名，如：身份证_01.jpg';
-        } else {
-            orderBtn.style.borderColor = 'var(--primary)'; orderBtn.style.background = 'var(--primary-light)'; orderBtn.style.color = 'var(--primary)';
-            typeBtn.style.borderColor = 'var(--border)'; typeBtn.style.background = 'var(--surface)'; typeBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '照片按拍摄顺序命名，如：01.jpg、02.jpg';
-        }
+        ['naming-type-btn','naming-type-btn2'].forEach(function(id) {
+            const typeBtn = document.getElementById(id);
+            if (!typeBtn) return;
+            const orderBtnId = id.replace('type','order');
+            const orderBtn = document.getElementById(orderBtnId);
+            const hintId = id.replace('naming-type-btn','naming-hint');
+            const hint = document.getElementById(hintId);
+            if (namingMode === 'type') {
+                typeBtn.style.borderColor = 'var(--primary)'; typeBtn.style.background = 'var(--primary-light)'; typeBtn.style.color = 'var(--primary)';
+                orderBtn.style.borderColor = 'var(--border)'; orderBtn.style.background = 'var(--surface)'; orderBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '照片按「证件类型名_序号」命名，如：身份证_01.jpg';
+            } else {
+                orderBtn.style.borderColor = 'var(--primary)'; orderBtn.style.background = 'var(--primary-light)'; orderBtn.style.color = 'var(--primary)';
+                typeBtn.style.borderColor = 'var(--border)'; typeBtn.style.background = 'var(--surface)'; typeBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '照片按拍摄顺序命名，如：01.jpg、02.jpg';
+            }
+        });
     }
     function updatePackModeUI() {
-        const folderBtn = document.getElementById('pack-folder-btn');
-        const flatBtn = document.getElementById('pack-flat-btn');
-        const hint = document.getElementById('pack-hint');
-        if (packMode === 'folder') {
-            folderBtn.style.borderColor = 'var(--primary)'; folderBtn.style.background = 'var(--primary-light)'; folderBtn.style.color = 'var(--primary)';
-            flatBtn.style.borderColor = 'var(--border)'; flatBtn.style.background = 'var(--surface)'; flatBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '照片按证件类型分别存入对应文件夹';
-        } else {
-            flatBtn.style.borderColor = 'var(--primary)'; flatBtn.style.background = 'var(--primary-light)'; flatBtn.style.color = 'var(--primary)';
-            folderBtn.style.borderColor = 'var(--border)'; folderBtn.style.background = 'var(--surface)'; folderBtn.style.color = 'var(--text-2)';
-            if (hint) hint.textContent = '所有照片放入以压缩包名命名的文件夹内';
-        }
+        ['pack-folder-btn','pack-folder-btn2'].forEach(function(id) {
+            const folderBtn = document.getElementById(id);
+            if (!folderBtn) return;
+            const flatBtnId = id.replace('folder','flat');
+            const flatBtn = document.getElementById(flatBtnId);
+            const hintId = id.replace('pack-folder-btn','pack-hint');
+            const hint = document.getElementById(hintId);
+            if (packMode === 'folder') {
+                folderBtn.style.borderColor = 'var(--primary)'; folderBtn.style.background = 'var(--primary-light)'; folderBtn.style.color = 'var(--primary)';
+                flatBtn.style.borderColor = 'var(--border)'; flatBtn.style.background = 'var(--surface)'; flatBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '照片按证件类型分别存入对应文件夹';
+            } else {
+                flatBtn.style.borderColor = 'var(--primary)'; flatBtn.style.background = 'var(--primary-light)'; flatBtn.style.color = 'var(--primary)';
+                folderBtn.style.borderColor = 'var(--border)'; folderBtn.style.background = 'var(--surface)'; folderBtn.style.color = 'var(--text-2)';
+                if (hint) hint.textContent = '所有照片放入以压缩包名命名的文件夹内';
+            }
+        });
     }
 
     // ===== THEME & DARK MODE =====
@@ -2720,27 +2894,28 @@
     };
 
     function updateDarkModeUI() {
-        const offBtn = document.getElementById('dark-off-btn');
-        const onBtn = document.getElementById('dark-on-btn');
-        const autoBtn = document.getElementById('dark-auto-btn');
-        const hint = document.getElementById('dark-hint');
-        // Reset all buttons
-        [offBtn, onBtn, autoBtn].forEach(btn => {
-            btn.style.borderColor = 'var(--border)';
-            btn.style.background = 'var(--surface)';
-            btn.style.color = 'var(--text-2)';
+        ['dark-off-btn','dark-off-btn2'].forEach(function(baseId) {
+            const suffix = baseId.replace('dark-off-btn','');
+            const offBtn = document.getElementById('dark-off-btn' + suffix);
+            const onBtn = document.getElementById('dark-on-btn' + suffix);
+            const autoBtn = document.getElementById('dark-auto-btn' + suffix);
+            const hint = document.getElementById('dark-hint' + suffix);
+            if (!offBtn) return;
+            [offBtn, onBtn, autoBtn].forEach(btn => {
+                btn.style.borderColor = 'var(--border)';
+                btn.style.background = 'var(--surface)';
+                btn.style.color = 'var(--text-2)';
+            });
+            const activeBtn = darkModePref === 'off' ? offBtn : darkModePref === 'on' ? onBtn : autoBtn;
+            activeBtn.style.borderColor = 'var(--primary)';
+            activeBtn.style.background = 'var(--primary-light)';
+            activeBtn.style.color = 'var(--primary)';
+            if (hint) {
+                if (darkModePref === 'off') hint.textContent = '使用浅色模式';
+                else if (darkModePref === 'on') hint.textContent = '使用深色模式';
+                else hint.textContent = '根据系统设置自动切换';
+            }
         });
-        // Highlight active button
-        const activeBtn = darkModePref === 'off' ? offBtn : darkModePref === 'on' ? onBtn : autoBtn;
-        activeBtn.style.borderColor = 'var(--primary)';
-        activeBtn.style.background = 'var(--primary-light)';
-        activeBtn.style.color = 'var(--primary)';
-        // Update hint text
-        if (hint) {
-            if (darkModePref === 'off') hint.textContent = '使用浅色模式';
-            else if (darkModePref === 'on') hint.textContent = '使用深色模式';
-            else hint.textContent = '根据系统设置自动切换';
-        }
     }
 
     // Listen for system theme changes when in auto mode
@@ -2926,23 +3101,21 @@
     let bgImageData = localStorage.getItem('ck_bg_image') || '';
     let bgOpacity = parseInt(localStorage.getItem('ck_bg_opacity') || '20');
     let bgBlur = parseInt(localStorage.getItem('ck_bg_blur') || '0');
-    // Crop state: Canvas-based crop
-    let bgCropImg = null; // Image object for canvas drawing
-    let bgCropOffsetX = 0;
-    let bgCropOffsetY = 0;
-    let bgCropScale = 1;
-    let bgCropImgNaturalW = 0;
-    let bgCropImgNaturalH = 0;
-    // Canvas dimensions
-    let bgCropCanvasW = 0;
-    let bgCropCanvasH = 0;
-    // Crop dashed rect position/size (9:20 ratio, centered in canvas)
-    let bgCropRectX = 0;
-    let bgCropRectY = 0;
-    let bgCropRectW = 0;
-    let bgCropRectH = 0;
-    // Crop ratio 9:20
-    const BG_CROP_RATIO = 9 / 20;
+    // Position/scale/rotation state (saved to localStorage)
+    let bgPosX = parseFloat(localStorage.getItem('ck_bg_pos_x') || '50');
+    let bgPosY = parseFloat(localStorage.getItem('ck_bg_pos_y') || '50');
+    let bgRotation = parseFloat(localStorage.getItem('ck_bg_rotation') || '0');
+    let bgUserScale = parseFloat(localStorage.getItem('ck_bg_scale') || '1');
+    let bgNaturalW = parseInt(localStorage.getItem('ck_bg_natural_w') || '0');
+    let bgNaturalH = parseInt(localStorage.getItem('ck_bg_natural_h') || '0');
+    // Preview dialog state
+    let bgPreviewImg = null;
+    let bgPreviewNaturalW = 0;
+    let bgPreviewNaturalH = 0;
+    let bgPreviewPosX = 50;
+    let bgPreviewPosY = 50;
+    let bgPreviewRotation = 0;
+    let bgPreviewScale = 1;
 
     function uploadBackground() {
         if (isAndroid && NativeBridge.pickImage) {
@@ -2956,8 +3129,7 @@
                 if (!file) return;
                 const reader = new FileReader();
                 reader.onload = function(ev) {
-                    const dataUrl = ev.target.result;
-                    showBgCropDialog(dataUrl);
+                    showBgPositionDialog(ev.target.result);
                 };
                 reader.readAsDataURL(file);
             };
@@ -2967,129 +3139,82 @@
 
     window.onPickImageResult = function(base64Data) {
         if (base64Data) {
-            showBgCropDialog('data:image/jpeg;base64,' + base64Data);
+            showBgPositionDialog('data:image/jpeg;base64,' + base64Data);
         }
     };
 
-    function showBgCropDialog(dataUrl) {
-        const img = new Image();
+    function showBgPositionDialog(dataUrl) {
+        bgPreviewPosX = 50;
+        bgPreviewPosY = 50;
+        bgPreviewRotation = 0;
+        bgPreviewScale = 1;
+        const img = document.getElementById('bg-preview-img');
         img.src = dataUrl;
         img.onload = function() {
-            bgCropImg = img;
-            bgCropImgNaturalW = img.naturalWidth;
-            bgCropImgNaturalH = img.naturalHeight;
-            // Adaptive canvas size based on viewport (CSS pixels)
+            bgPreviewImg = img;
+            bgPreviewNaturalW = img.naturalWidth;
+            bgPreviewNaturalH = img.naturalHeight;
+            // Calculate preview container size based on viewport
             const viewW = document.documentElement.clientWidth || 360;
             const viewH = document.documentElement.clientHeight || 640;
-            const canvasW = Math.min(Math.round(viewW * 0.85), 400);
-            const MAX_CROP_HEIGHT = Math.round(viewH * 0.5);
-            // Update dialog max-width to fit canvas + padding
-            const dialog = document.querySelector('#bg-crop-dialog .dialog');
-            if (dialog) dialog.style.maxWidth = (canvasW + 32) + 'px';
-            bgCropCanvasW = canvasW;
-            // Canvas height = image display height (natural aspect ratio, fit width), capped
-            let canvasH = canvasW * bgCropImgNaturalH / bgCropImgNaturalW;
-            if (canvasH > MAX_CROP_HEIGHT) canvasH = MAX_CROP_HEIGHT;
-            bgCropCanvasH = canvasH;
-            // Set canvas size
-            const canvas = document.getElementById('bg-crop-canvas');
-            canvas.width = canvasW;
-            canvas.height = canvasH;
-            canvas.style.height = canvasH + 'px';
-            // Calculate 9:20 dashed rect dimensions, centered in canvas
-            let cropRectW, cropRectH;
-            const fitByWidthH = canvasW * 20 / 9;
-            if (fitByWidthH <= canvasH) {
-                cropRectW = canvasW;
-                cropRectH = fitByWidthH;
-            } else {
-                cropRectH = canvasH;
-                cropRectW = canvasH * 9 / 20;
-            }
-            bgCropRectW = cropRectW;
-            bgCropRectH = cropRectH;
-            bgCropRectX = (canvasW - cropRectW) / 2;
-            bgCropRectY = (canvasH - cropRectH) / 2;
-            // Initial scale: fit image to canvas width, ensure covers dashed rect
-            const fitScale = canvasW / bgCropImgNaturalW;
-            const minCoverScale = Math.max(bgCropRectW / bgCropImgNaturalW, bgCropRectH / bgCropImgNaturalH);
-            bgCropScale = Math.max(fitScale, minCoverScale);
-            // Center image on the dashed rect area
-            const displayW = bgCropImgNaturalW * bgCropScale;
-            const displayH = bgCropImgNaturalH * bgCropScale;
-            bgCropOffsetX = bgCropRectX + (bgCropRectW - displayW) / 2;
-            bgCropOffsetY = bgCropRectY + (bgCropRectH - displayH) / 2;
-            // Draw initial state
-            drawCropCanvas();
+            const containerW = Math.min(Math.round(viewW * 0.85), 340);
+            // Device screen ratio for dashed rect
+            const screenRatio = viewW / viewH;
+            const containerH = Math.round(containerW / screenRatio);
+            const container = document.getElementById('bg-crop-container');
+            container.style.height = containerH + 'px';
+            // Position the image to cover the container
+            updateBgPreview(containerW, containerH);
+            // Draw dashed rect (device screen ratio = container itself)
+            const rect = document.getElementById('bg-screen-rect');
+            rect.style.left = '0';
+            rect.style.top = '0';
+            rect.style.width = '100%';
+            rect.style.height = '100%';
             // Setup gestures
-            setupBgCropGestures();
+            setupBgPositionGestures(containerW, containerH);
             showDialog('bg-crop-dialog');
         };
     }
 
-    function drawCropCanvas() {
-        const canvas = document.getElementById('bg-crop-canvas');
-        const ctx = canvas.getContext('2d');
-        const w = bgCropCanvasW;
-        const h = bgCropCanvasH;
-        // Clear canvas
-        ctx.clearRect(0, 0, w, h);
-        // Draw background (dark)
-        ctx.fillStyle = '#000';
-        ctx.fillRect(0, 0, w, h);
-        // Draw image at current offset and scale
-        const displayW = bgCropImgNaturalW * bgCropScale;
-        const displayH = bgCropImgNaturalH * bgCropScale;
-        ctx.drawImage(bgCropImg, bgCropOffsetX, bgCropOffsetY, displayW, displayH);
-        // Draw semi-transparent overlay outside the dashed rect
-        ctx.fillStyle = 'rgba(0,0,0,0.5)';
-        // Top
-        ctx.fillRect(0, 0, w, bgCropRectY);
-        // Bottom
-        ctx.fillRect(0, bgCropRectY + bgCropRectH, w, h - bgCropRectY - bgCropRectH);
-        // Left
-        ctx.fillRect(0, bgCropRectY, bgCropRectX, bgCropRectH);
-        // Right
-        ctx.fillRect(bgCropRectX + bgCropRectW, bgCropRectY, w - bgCropRectX - bgCropRectW, bgCropRectH);
-        // Draw dashed rect border
-        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-        ctx.lineWidth = 2;
-        ctx.setLineDash([6, 4]);
-        ctx.strokeRect(bgCropRectX, bgCropRectY, bgCropRectW, bgCropRectH);
-        ctx.setLineDash([]);
+    function updateBgPreview(containerW, containerH) {
+        const img = document.getElementById('bg-preview-img');
+        if (!img || !bgPreviewImg) return;
+        // Calculate cover size with user scale
+        const imgRatio = bgPreviewNaturalW / bgPreviewNaturalH;
+        const containerRatio = containerW / containerH;
+        let coverW, coverH;
+        if (imgRatio > containerRatio) {
+            coverH = containerH * bgPreviewScale;
+            coverW = coverH * imgRatio;
+        } else {
+            coverW = containerW * bgPreviewScale;
+            coverH = coverW / imgRatio;
+        }
+        img.style.width = coverW + 'px';
+        img.style.height = coverH + 'px';
+        // Position: posX/posY as percentage offsets
+        const offsetX = containerW / 2 - (coverW * bgPreviewPosX / 100);
+        const offsetY = containerH / 2 - (coverH * bgPreviewPosY / 100);
+        img.style.marginLeft = offsetX + 'px';
+        img.style.marginTop = offsetY + 'px';
+        img.style.transform = 'rotate(' + bgPreviewRotation + 'deg)';
+        img.style.transformOrigin = 'center center';
+        img.style.objectFit = 'cover';
     }
 
-    function setupBgCropGestures() {
+    function setupBgPositionGestures(containerW, containerH) {
         const container = document.getElementById('bg-crop-container');
         let dragging = false;
         let startX = 0, startY = 0;
-        let startOffsetX = 0, startOffsetY = 0;
+        let startPosX = 50, startPosY = 50;
         // Pinch state
         let pinching = false;
         let lastPinchDist = 0;
         let startScale = 1;
-
-        function getDisplaySize() {
-            return {
-                w: bgCropImgNaturalW * bgCropScale,
-                h: bgCropImgNaturalH * bgCropScale
-            };
-        }
-        function clampOffset() {
-            const d = getDisplaySize();
-            const minX = Math.min(bgCropRectX, bgCropRectX + bgCropRectW - d.w);
-            const maxX = bgCropRectX;
-            bgCropOffsetX = Math.max(minX, Math.min(maxX, bgCropOffsetX));
-            const minY = Math.min(bgCropRectY, bgCropRectY + bgCropRectH - d.h);
-            const maxY = bgCropRectY;
-            bgCropOffsetY = Math.max(minY, Math.min(maxY, bgCropOffsetY));
-        }
-        function minScale() {
-            return Math.max(
-                bgCropRectW / bgCropImgNaturalW,
-                bgCropRectH / bgCropImgNaturalH
-            );
-        }
+        // Rotation state
+        let lastAngle = 0;
+        let startRotation = 0;
 
         container.ontouchstart = function(e) {
             if (e.touches.length === 2) {
@@ -3098,15 +3223,18 @@
                 const dx = e.touches[1].clientX - e.touches[0].clientX;
                 const dy = e.touches[1].clientY - e.touches[0].clientY;
                 lastPinchDist = Math.sqrt(dx * dx + dy * dy);
-                startScale = bgCropScale;
+                startScale = bgPreviewScale;
+                // Calculate initial angle for rotation
+                lastAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+                startRotation = bgPreviewRotation;
                 e.preventDefault();
             } else if (e.touches.length === 1) {
                 pinching = false;
                 dragging = true;
                 startX = e.touches[0].clientX;
                 startY = e.touches[0].clientY;
-                startOffsetX = bgCropOffsetX;
-                startOffsetY = bgCropOffsetY;
+                startPosX = bgPreviewPosX;
+                startPosY = bgPreviewPosY;
             }
         };
         container.ontouchmove = function(e) {
@@ -3115,26 +3243,33 @@
                 const dx = e.touches[1].clientX - e.touches[0].clientX;
                 const dy = e.touches[1].clientY - e.touches[0].clientY;
                 const dist = Math.sqrt(dx * dx + dy * dy);
+                // Scale
                 const ratio = dist / lastPinchDist;
-                const newScale = Math.max(minScale(), Math.min(startScale * ratio * 3, startScale * 5));
-                const cx = (e.touches[0].clientX + e.touches[1].clientX) / 2;
-                const cy = (e.touches[0].clientY + e.touches[1].clientY) / 2;
-                const rect = container.getBoundingClientRect();
-                const px = cx - rect.left;
-                const py = cy - rect.top;
-                const oldScale = bgCropScale;
-                bgCropScale = newScale;
-                bgCropOffsetX = px - (px - bgCropOffsetX) * (newScale / oldScale);
-                bgCropOffsetY = py - (py - bgCropOffsetY) * (newScale / oldScale);
-                clampOffset();
-                drawCropCanvas();
+                bgPreviewScale = Math.max(1, Math.min(startScale * ratio, 5));
+                // Rotation
+                const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+                bgPreviewRotation = startRotation + (angle - lastAngle);
+                updateBgPreview(containerW, containerH);
             } else if (dragging && e.touches.length === 1) {
                 const dx = e.touches[0].clientX - startX;
                 const dy = e.touches[0].clientY - startY;
-                bgCropOffsetX = startOffsetX + dx;
-                bgCropOffsetY = startOffsetY + dy;
-                clampOffset();
-                drawCropCanvas();
+                // Convert pixel drag to percentage offset
+                const imgRatio = bgPreviewNaturalW / bgPreviewNaturalH;
+                const containerRatio = containerW / containerH;
+                let coverW, coverH;
+                if (imgRatio > containerRatio) {
+                    coverH = containerH * bgPreviewScale;
+                    coverW = coverH * imgRatio;
+                } else {
+                    coverW = containerW * bgPreviewScale;
+                    coverH = coverW / imgRatio;
+                }
+                bgPreviewPosX = startPosX - (dx / coverW) * 100;
+                bgPreviewPosY = startPosY - (dy / coverH) * 100;
+                // Clamp
+                bgPreviewPosX = Math.max(0, Math.min(100, bgPreviewPosX));
+                bgPreviewPosY = Math.max(0, Math.min(100, bgPreviewPosY));
+                updateBgPreview(containerW, containerH);
             }
         };
         container.ontouchend = function(e) {
@@ -3143,29 +3278,25 @@
         };
     }
 
-    function applyBgCrop() {
-        const canvas = document.createElement('canvas');
-        // Output at 9:20 ratio, width = screen width
-        const screenW = window.innerWidth;
-        const screenH = Math.round(screenW / BG_CROP_RATIO);
-        canvas.width = screenW;
-        canvas.height = screenH;
-        const ctx = canvas.getContext('2d');
-        // Calculate source region from crop state
-        // The dashed rect is at (bgCropRectX, bgCropRectY) in canvas coords
-        // The image is at (bgCropOffsetX, bgCropOffsetY) with scale bgCropScale
-        // Map dashed rect position to natural image coords
-        const srcX = (bgCropRectX - bgCropOffsetX) / bgCropScale;
-        const srcY = (bgCropRectY - bgCropOffsetY) / bgCropScale;
-        const srcW = bgCropRectW / bgCropScale;
-        const srcH = bgCropRectH / bgCropScale;
-        ctx.drawImage(bgCropImg, srcX, srcY, srcW, srcH, 0, 0, screenW, screenH);
-        bgImageData = canvas.toDataURL('image/jpeg', 0.6);
+    function applyBgPosition() {
+        bgImageData = document.getElementById('bg-preview-img').src;
+        bgPosX = bgPreviewPosX;
+        bgPosY = bgPreviewPosY;
+        bgRotation = bgPreviewRotation;
+        bgUserScale = bgPreviewScale;
+        bgNaturalW = bgPreviewNaturalW;
+        bgNaturalH = bgPreviewNaturalH;
         try {
             localStorage.setItem('ck_bg_image', bgImageData);
         } catch(e) {
             showToast('背景图片过大，无法保存', 'warning');
         }
+        localStorage.setItem('ck_bg_pos_x', String(bgPosX));
+        localStorage.setItem('ck_bg_pos_y', String(bgPosY));
+        localStorage.setItem('ck_bg_rotation', String(bgRotation));
+        localStorage.setItem('ck_bg_scale', String(bgUserScale));
+        localStorage.setItem('ck_bg_natural_w', String(bgNaturalW));
+        localStorage.setItem('ck_bg_natural_h', String(bgNaturalH));
         localStorage.setItem('ck_bg_opacity', String(bgOpacity));
         localStorage.setItem('ck_bg_blur', String(bgBlur));
         applyCustomBackground();
@@ -3174,9 +3305,25 @@
         showToast('背景已应用', 'success');
     }
 
+    function cancelBgPosition() {
+        hideDialog('bg-crop-dialog');
+    }
+
     function removeBackground() {
         bgImageData = '';
+        bgPosX = 50;
+        bgPosY = 50;
+        bgRotation = 0;
+        bgUserScale = 1;
+        bgNaturalW = 0;
+        bgNaturalH = 0;
         localStorage.removeItem('ck_bg_image');
+        localStorage.removeItem('ck_bg_pos_x');
+        localStorage.removeItem('ck_bg_pos_y');
+        localStorage.removeItem('ck_bg_rotation');
+        localStorage.removeItem('ck_bg_scale');
+        localStorage.removeItem('ck_bg_natural_w');
+        localStorage.removeItem('ck_bg_natural_h');
         applyCustomBackground();
         updateBgUI();
         showToast('背景已移除', 'success');
@@ -3184,14 +3331,24 @@
 
     function updateBgOpacity(val) {
         bgOpacity = parseInt(val);
-        document.getElementById('bg-opacity-val').textContent = val + '%';
+        ['','2'].forEach(function(suffix) {
+            const el = document.getElementById('bg-opacity-val' + suffix);
+            if (el) el.textContent = val + '%';
+            const slider = document.getElementById('bg-opacity-slider' + suffix);
+            if (slider) slider.value = val;
+        });
         localStorage.setItem('ck_bg_opacity', String(bgOpacity));
         applyCustomBackground();
     }
 
     function updateBgBlur(val) {
         bgBlur = parseInt(val);
-        document.getElementById('bg-blur-val').textContent = val + '%';
+        ['','2'].forEach(function(suffix) {
+            const el = document.getElementById('bg-blur-val' + suffix);
+            if (el) el.textContent = val + '%';
+            const slider = document.getElementById('bg-blur-slider' + suffix);
+            if (slider) slider.value = val;
+        });
         localStorage.setItem('ck_bg_blur', String(bgBlur));
         applyCustomBackground();
     }
@@ -3202,47 +3359,85 @@
         if (!bgImageData) {
             layer.style.display = 'none';
             layer.style.backgroundImage = '';
+            layer.style.transform = '';
             root.style.removeProperty('--custom-screen-bg');
             root.style.removeProperty('--custom-surface-bg');
+            root.style.removeProperty('--custom-nav-bg');
             return;
         }
         layer.style.display = 'block';
         const blurPx = Math.round(bgBlur * 0.2);
         layer.style.backgroundImage = 'url(' + bgImageData + ')';
-        layer.style.backgroundSize = 'cover';
-        layer.style.backgroundPosition = 'center';
+        // Calculate cover size with user scale multiplier
+        const layerW = window.innerWidth;
+        const layerH = window.innerHeight;
+        const scale = bgUserScale || 1;
+        if (bgNaturalW && bgNaturalH) {
+            const imgRatio = bgNaturalW / bgNaturalH;
+            const layerRatio = layerW / layerH;
+            let coverW, coverH;
+            if (imgRatio > layerRatio) {
+                coverH = layerH;
+                coverW = layerH * imgRatio;
+            } else {
+                coverW = layerW;
+                coverH = layerW / imgRatio;
+            }
+            layer.style.backgroundSize = (coverW * scale) + 'px ' + (coverH * scale) + 'px';
+        } else {
+            // Fallback if dimensions not stored
+            layer.style.backgroundSize = scale > 1 ? (scale * 100) + '%' : 'cover';
+        }
+        layer.style.backgroundPosition = bgPosX + '% ' + bgPosY + '%';
         layer.style.opacity = '1';
         layer.style.filter = 'blur(' + blurPx + 'px)';
-        // Apply alpha to all UI layers via CSS variables: higher opacity = more visible bg = lower alpha
+        // Apply rotation
+        if (bgRotation && bgRotation !== 0) {
+            layer.style.transform = 'rotate(' + bgRotation + 'deg)';
+        } else {
+            layer.style.transform = '';
+        }
+        // Apply alpha to all UI layers via CSS variables
         const alpha = Math.max(0.1, 1 - bgOpacity / 100);
         const isDark = root.getAttribute('data-theme') === 'dark';
-        // Screen background (var(--bg): #F0F2F5 light / #1A1A1A dark)
         const bgR = isDark ? 26 : 240;
         const bgG = isDark ? 26 : 242;
         const bgB = isDark ? 26 : 245;
         root.style.setProperty('--custom-screen-bg', 'rgba(' + bgR + ',' + bgG + ',' + bgB + ',' + alpha + ')');
-        // Card/nav/header background (var(--surface): #FFFFFF light / #2D2D2D dark)
         const surfR = isDark ? 45 : 255;
         const surfG = isDark ? 45 : 255;
         const surfB = isDark ? 45 : 255;
         root.style.setProperty('--custom-surface-bg', 'rgba(' + surfR + ',' + surfG + ',' + surfB + ',' + alpha + ')');
+        const navAlpha = Math.min(1, alpha + (1 - alpha) * 0.6);
+        root.style.setProperty('--custom-nav-bg', 'rgba(' + surfR + ',' + surfG + ',' + surfB + ',' + navAlpha + ')');
     }
 
+    // Re-apply background on orientation change
+    window.addEventListener('orientationchange', function() {
+        setTimeout(function() { applyCustomBackground(); }, 200);
+    });
+    window.addEventListener('resize', function() {
+        if (bgImageData) applyCustomBackground();
+    });
+
     function updateBgUI() {
-        const controls = document.getElementById('bg-controls');
-        const opacitySlider = document.getElementById('bg-opacity-slider');
-        const blurSlider = document.getElementById('bg-blur-slider');
-        const opacityVal = document.getElementById('bg-opacity-val');
-        const blurVal = document.getElementById('bg-blur-val');
-        if (bgImageData) {
-            controls.style.display = 'block';
-            opacitySlider.value = bgOpacity;
-            blurSlider.value = bgBlur;
-            opacityVal.textContent = bgOpacity + '%';
-            blurVal.textContent = bgBlur + '%';
-        } else {
-            controls.style.display = 'none';
-        }
+        ['','2'].forEach(function(suffix) {
+            const controls = document.getElementById('bg-controls' + suffix);
+            const opacitySlider = document.getElementById('bg-opacity-slider' + suffix);
+            const blurSlider = document.getElementById('bg-blur-slider' + suffix);
+            const opacityVal = document.getElementById('bg-opacity-val' + suffix);
+            const blurVal = document.getElementById('bg-blur-val' + suffix);
+            if (!controls) return;
+            if (bgImageData) {
+                controls.style.display = 'block';
+                if (opacitySlider) opacitySlider.value = bgOpacity;
+                if (blurSlider) blurSlider.value = bgBlur;
+                if (opacityVal) opacityVal.textContent = bgOpacity + '%';
+                if (blurVal) blurVal.textContent = bgBlur + '%';
+            } else {
+                controls.style.display = 'none';
+            }
+        });
     }
 
     // ===== USAGE STATS =====
