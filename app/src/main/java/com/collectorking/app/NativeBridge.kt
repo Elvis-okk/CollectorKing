@@ -14,6 +14,10 @@ import java.io.ByteArrayInputStream
 import java.util.zip.ZipOutputStream
 import java.util.zip.ZipEntry
 import android.util.Base64
+import android.content.ContentValues
+import android.os.Environment
+import android.provider.MediaStore
+import android.net.Uri
 
 /**
  * JavaScript bridge interface for communication between WebView and native Android.
@@ -606,5 +610,65 @@ class NativeBridge(private val activity: Activity) {
         val bgDir = File(activity.getExternalFilesDir(null), "backgrounds")
         if (!bgDir.exists()) return 0
         return bgDir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1024
+    }
+
+    /**
+     * Delete all photos and data for a specific history record.
+     * Called from JS: NativeBridge.deleteHistoryPhotos(historyId)
+     */
+    @JavascriptInterface
+    fun deleteHistoryPhotos(historyId: String): Int {
+        val historyDir = File(activity.getExternalFilesDir(null), "history/$historyId")
+        if (!historyDir.exists()) return 0
+        var count = 0
+        historyDir.walkTopDown().forEach { file ->
+            if (file.isFile) { file.delete(); count++ }
+        }
+        // Remove empty directories
+        historyDir.walkTopDown().filter { it.isDirectory && it.listFiles()?.isEmpty() != false }.forEach { it.delete() }
+        return count
+    }
+
+    /**
+     * Save a photo to the system album (DCIM/CollectorKing).
+     * Called from JS: NativeBridge.saveToAlbum(base64Data, fileName)
+     */
+    @JavascriptInterface
+    fun saveToAlbum(base64Data: String, fileName: String): Boolean {
+        return try {
+            val bytes = Base64.decode(base64Data, Base64.NO_WRAP)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                // Android Q+: Use MediaStore with IS_PENDING mechanism
+                val values = ContentValues().apply {
+                    put(MediaStore.Images.Media.DISPLAY_NAME, fileName)
+                    put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+                    put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_DCIM + "/CollectorKing")
+                    put(MediaStore.Images.Media.IS_PENDING, 1)
+                }
+                val uri = activity.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, values)
+                    ?: return false
+                activity.contentResolver.openOutputStream(uri)?.use { os ->
+                    ByteArrayInputStream(bytes).use { input -> input.copyTo(os) }
+                }
+                values.clear()
+                values.put(MediaStore.Images.Media.IS_PENDING, 0)
+                activity.contentResolver.update(uri, values, null, null)
+            } else {
+                // Android below Q: Write to DCIM directory and scan
+                val dcimDir = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "CollectorKing")
+                if (!dcimDir.exists()) dcimDir.mkdirs()
+                val file = File(dcimDir, fileName)
+                FileOutputStream(file).use { fos ->
+                    ByteArrayInputStream(bytes).use { input -> input.copyTo(fos) }
+                }
+                // Notify MediaScanner to make file visible in gallery
+                val scanIntent = Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE)
+                scanIntent.data = Uri.fromFile(file)
+                activity.sendBroadcast(scanIntent)
+            }
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 }
