@@ -260,19 +260,22 @@ class MainActivity : AppCompatActivity() {
         pendingCameraPhotoIndex = photoIndex
 
         val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        if (takePictureIntent.resolveActivity(packageManager) != null) {
-            val photoFile = createImageFile()
-            if (photoFile != null) {
-                val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
-                pendingCameraUri = uri
-                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+        // On HarmonyOS and some devices, resolveActivity() may return null even when camera exists
+        // So we try to launch directly and catch the exception if no camera app is available
+        val photoFile = createImageFile()
+        if (photoFile != null) {
+            val uri = FileProvider.getUriForFile(this, "${packageName}.fileprovider", photoFile)
+            pendingCameraUri = uri
+            takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, uri)
+            takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            try {
                 nativeCameraLauncher.launch(takePictureIntent)
-            } else {
-                Toast.makeText(this, "无法创建临时文件", Toast.LENGTH_SHORT).show()
+            } catch (e: Exception) {
+                Toast.makeText(this, "无法打开相机: ${e.message}", Toast.LENGTH_SHORT).show()
                 callJsFunction("window.onCameraResult && window.onCameraResult('${escapeJs(docType)}', $photoIndex, '')")
             }
         } else {
-            Toast.makeText(this, "没有可用的相机应用", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "无法创建临时文件", Toast.LENGTH_SHORT).show()
             callJsFunction("window.onCameraResult && window.onCameraResult('${escapeJs(docType)}', $photoIndex, '')")
         }
     }
@@ -288,16 +291,11 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_PICK).apply {
             type = "image/*"
         }
-        // Ensure the intent resolves before launching
-        if (intent.resolveActivity(packageManager) != null) {
-            try {
-                nativeAlbumLauncher.launch(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
-                callJsFunction("window.onAlbumResult && window.onAlbumResult('${escapeJs(docType)}', $photoIndex, '')")
-            }
-        } else {
-            Toast.makeText(this, "没有可用的相册应用", Toast.LENGTH_SHORT).show()
+        // On HarmonyOS, resolveActivity may return null even when gallery exists
+        try {
+            nativeAlbumLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
             callJsFunction("window.onAlbumResult && window.onAlbumResult('${escapeJs(docType)}', $photoIndex, '')")
         }
     }
@@ -339,15 +337,11 @@ class MainActivity : AppCompatActivity() {
         val intent = Intent(Intent.ACTION_PICK).apply {
             type = "image/*"
         }
-        if (intent.resolveActivity(packageManager) != null) {
-            try {
-                pickImageLauncher.launch(intent)
-            } catch (e: Exception) {
-                Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
-                callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
-            }
-        } else {
-            Toast.makeText(this, "没有可用的相册应用", Toast.LENGTH_SHORT).show()
+        // On HarmonyOS, resolveActivity may return null even when gallery exists
+        try {
+            pickImageLauncher.launch(intent)
+        } catch (e: Exception) {
+            Toast.makeText(this, "无法打开相册: ${e.message}", Toast.LENGTH_SHORT).show()
             callJsFunction("window.onPickImageResult && window.onPickImageResult('')")
         }
     }
@@ -645,16 +639,17 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 val takePictureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-                if (takePictureIntent.resolveActivity(packageManager) != null) {
-                    val photoFile = createImageFile()
-                    photoFile?.let {
-                        cameraImageUri = FileProvider.getUriForFile(
-                            this@MainActivity,
-                            "${packageName}.fileprovider",
-                            it
-                        )
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
-                    }
+                // On HarmonyOS, resolveActivity may return null even when camera exists
+                // Try creating the intent anyway
+                val photoFile = createImageFile()
+                photoFile?.let {
+                    cameraImageUri = FileProvider.getUriForFile(
+                        this@MainActivity,
+                        "${packageName}.fileprovider",
+                        it
+                    )
+                    takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, cameraImageUri)
+                    takePictureIntent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION or Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 }
 
                 val contentIntent = Intent(Intent.ACTION_PICK).apply {

@@ -61,6 +61,37 @@ class NativeBridge(private val activity: Activity) {
     }
 
     /**
+     * Get status bar height in pixels.
+     * Used by WebView to handle safe area on HarmonyOS and other platforms
+     * where env(safe-area-inset-top) may not work correctly.
+     */
+    @JavascriptInterface
+    fun getStatusBarHeight(): Int {
+        val resourceId = activity.resources.getIdentifier("status_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            activity.resources.getDimensionPixelSize(resourceId)
+        } else {
+            // Fallback: approximate status bar height (24dp)
+            val density = activity.resources.displayMetrics.density
+            (24 * density + 0.5f).toInt()
+        }
+    }
+
+    /**
+     * Get navigation bar height in pixels.
+     * Used by WebView to handle safe area on devices where env(safe-area-inset-bottom) may not work.
+     */
+    @JavascriptInterface
+    fun getNavigationBarHeight(): Int {
+        val resourceId = activity.resources.getIdentifier("navigation_bar_height", "dimen", "android")
+        return if (resourceId > 0) {
+            activity.resources.getDimensionPixelSize(resourceId)
+        } else {
+            0
+        }
+    }
+
+    /**
      * Open camera to take a photo for a specific document type and photo index.
      * Called from JS: NativeBridge.openCamera("身份证", 0)
      * Result callback: window.onCameraResult(docType, photoIndex, base64Data)
@@ -355,6 +386,17 @@ class NativeBridge(private val activity: Activity) {
     }
 
     /**
+     * Get count of photo files in photos directory.
+     * Called from JS: NativeBridge.getPhotosCount()
+     */
+    @JavascriptInterface
+    fun getPhotosCount(): Int {
+        val photosDir = File(activity.getExternalFilesDir(null), "photos")
+        if (!photosDir.exists()) return 0
+        return photosDir.walkTopDown().filter { it.isFile }.count()
+    }
+
+    /**
      * Get the external photos directory path.
      * Called from JS: NativeBridge.getPhotosDir()
      */
@@ -374,6 +416,17 @@ class NativeBridge(private val activity: Activity) {
         val historyDir = File(activity.getExternalFilesDir(null), "history")
         if (!historyDir.exists()) return 0
         return historyDir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1024
+    }
+
+    /**
+     * Get count of files in history directory.
+     * Called from JS: NativeBridge.getHistoryFileCount()
+     */
+    @JavascriptInterface
+    fun getHistoryFileCount(): Int {
+        val historyDir = File(activity.getExternalFilesDir(null), "history")
+        if (!historyDir.exists()) return 0
+        return historyDir.walkTopDown().filter { it.isFile }.count()
     }
 
     /**
@@ -403,6 +456,17 @@ class NativeBridge(private val activity: Activity) {
         val packagesDir = File(activity.getExternalFilesDir(null), "packages")
         if (!packagesDir.exists()) return 0
         return packagesDir.walkTopDown().filter { it.isFile }.sumOf { it.length() } / 1024
+    }
+
+    /**
+     * Get count of package (ZIP) files.
+     * Called from JS: NativeBridge.getPackagesFileCount()
+     */
+    @JavascriptInterface
+    fun getPackagesFileCount(): Int {
+        val packagesDir = File(activity.getExternalFilesDir(null), "packages")
+        if (!packagesDir.exists()) return 0
+        return packagesDir.listFiles()?.count { it.isFile } ?: 0
     }
 
     /**
